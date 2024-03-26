@@ -1,0 +1,22 @@
+entity_types_list = [
+    'PER',
+    'NORP',
+    'FAC',
+    'ORG',
+    'GPE',
+    'LOC',
+    'PRODUCT',
+    'EVENT',
+    'WORK_OF_ART',
+    'LAW',
+    'LANGUAGE',
+    'DATE',
+    'TIME',
+    'PERCENT',
+    'MONEY',
+    'QUANTITY',
+    'ORDINAL',
+    'CARDINAL',
+    'NEWS',
+    'MEDIA'
+ ]
