@@ -1,11 +1,22 @@
-from dash import Dash, html, dcc, Input, Output, callback, no_update
+import warnings
+
+from dash import Dash, html, dcc, Input, Output, State, callback, no_update
 import dash
 import dash_bootstrap_components as dbc
 from dashvis import DashNetwork
-import matplotlib as mpl
+# import matplotlib as mpl
+from matplotlib.colors import rgb2hex
+from matplotlib.cm import get_cmap
 
 from extract_entities import news_with_entities
+from generate_networks import generate_kg
 from utils import entity_types_list
+from network_options.options import default_options_
+
+
+warnings.filterwarnings("ignore")
+
+colors = get_cmap('tab20').colors
 
 app = Dash(
     __name__,
@@ -14,12 +25,35 @@ app = Dash(
         dbc.themes.YETI,
         dbc.icons.BOOTSTRAP
     ],
-     meta_tags=[
+    meta_tags=[
         {'name': 'viewport',
         'content': 'width=device-width, initial-scale=1.0'}
-    ]
+    ],
+    # suppress_callback_exceptions=True
 )
 
+# Initia KG
+data_for_kg = generate_kg(
+    news_list=news_with_entities,
+    entity_types=entity_types_list,
+    colors=colors,
+    color_converter=rgb2hex
+)
+network_1 = DashNetwork(
+            id='kg_news-1',
+            style={
+                'height': '800px',
+                'width': '100%',
+                'background': "#222222"
+            },
+            data={
+                'nodes': data_for_kg['nodes'],
+                'edges': data_for_kg['edges']
+            },
+            options=default_options_
+)
+
+# Layout
 app.layout = dbc.Container(
     [
       dbc.Row(
@@ -40,6 +74,13 @@ app.layout = dbc.Container(
                         html.P("Visualiza los protagonistas de las noticias de hoy")
                     ],
                     width={'size': 3, 'offset': 0}
+                ),
+                dbc.Col(
+                    [
+                        html.P(
+                            id='text-url-1'
+                        )
+                    ]
                 )
             ]
         ),
@@ -47,7 +88,14 @@ app.layout = dbc.Container(
             [
                 dbc.Col(
                     [
-                        html.Div(id='network-1')
+                        dbc.Spinner(
+                            html.Div(
+                                    id='network-1',
+                                    children=[network_1]
+                                ),
+                            color='primary',
+                            size='md'
+                        )
                     ],
                     width={'size': 12}
                 )
@@ -74,96 +122,132 @@ app.layout = dbc.Container(
     fluid=True
 )
 
-# print(len(news_with_entities))
-# print(news_with_entities[2])
+# Callbacks
+
+# @callback(
+#     Output('network-1', 'children'),
+#     Input('dropdown-1', 'value')
+# )
+# def generate_kg(media_name):
+#     all_entities = []
+#     for entity_list in [ent for ent in [l['entities'] for l in news_with_entities]]:
+#         for ent in entity_list:
+#             all_entities.append(ent['entity'])
+#     all_entities = set(all_entities)
+#     news_ids = [n['id'] for n in news_with_entities]
+#     max_news_id = max(news_ids)
+#     entity_ids = {ent: i for i, ent in enumerate(all_entities, max_news_id + 1)}
+#     max_entities_id = max(entity_ids.values())
+#     media_names = set([n['media'] for n in news_with_entities])
+#     media_ids = {media: i for i, media in enumerate(media_names, max_entities_id + 1)}
+    
+#     colors_for_nodes = {
+#         ent_label: mpl.colors.rgb2hex(c) for ent_label, c in zip(entity_types_list, mpl.cm.get_cmap('tab20').colors)
+#     }
+#     # usar algún método chain para crear nodos con sus ids?
+#     nodes = []
+#     edges = []
+#     for media in media_names:
+#         media_dict = {
+#             'id': media_ids[media],
+#             'label': media,
+#             'title': media,
+#             'group': 'MEDIA',
+#             'color': colors_for_nodes['MEDIA'],
+#             'shape': 'dot',
+#             'font': {
+#                 'color': 'white',
+#                 'size': 17
+#             }
+#         }
+#         nodes.append(media_dict)
+#     for news_dict in news_with_entities:
+#         entity_news_dict = {
+#             'id': news_dict['id'],
+#             'title': news_dict['url'],
+#             'label': news_dict['body_text'][:20],
+#             'group': 'NEWS',
+#             'color': colors_for_nodes['NEWS'],
+#             'shape': 'dot',
+#             'font': {
+#                 'color': 'white',
+#                 'size': 17
+#             }
+#         }
+#         edges.append(
+#             {
+#                 'label': 'PUBLICADO_POR',
+#                 'from': news_dict['id'],
+#                 'to': media_ids[news_dict['media']],
+#                 'arrows': 'to',
+#                 'font': {
+#                     'color': '#D3D3D3',
+#                     'size': 12,
+#                     'strokeWidth': 0
+#                 }
+#             }
+#         )
+#         nodes.append(entity_news_dict)
+#         for ent in news_dict['entities']:
+#             if not ent['entity'] in [node['label'] for node in nodes]:
+#                 entity_ent_dict = {
+#                     'id': entity_ids[ent['entity']],
+#                     'label': ent['entity'],
+#                     'group': 'ENTITY',
+#                     'title': ent['entity_label'],
+#                     'color': colors_for_nodes[ent['entity_label']],
+#                     'shape': 'dot',
+#                     'font': {
+#                         'color': 'white',
+#                         'size': 17
+#                     }
+#                 }
+#                 nodes.append(entity_ent_dict)
+#             edges.append(
+#                 {
+#                     'label': 'MENCIONADO_EN',
+#                     'from': entity_ids[ent['entity']],
+#                     'to': news_dict['id'],
+#                     'arrows': 'to',
+#                     'font': {
+#                     'color': '#D3D3D3',
+#                     'size': 12,
+#                     'strokeWidth': 0
+#                 }
+#                 }
+#             )
+    
+#     network = DashNetwork(
+#         id='kg_news-1',
+#         style={
+#             'height': '800px',
+#             'width': '100%',
+#             'background': "#222222"
+#         },
+#         data={
+#             'nodes': nodes,
+#             'edges': edges
+#         }
+#     )
+    
+#     return data
+
 
 @callback(
-    Output('network-1', 'children'),
-    Input('dropdown-1', 'value')
+    Output('text-url-1', 'children'),
+    Input('kg_news-1', 'selectNode'),
+    # prevent_initial_call=True
 )
-def generate_kg(media_name):
-    all_entities = []
-    for entity_list in [ent for ent in [l['entities'] for l in news_with_entities]]:
-        for ent in entity_list:
-            all_entities.append(ent['entity'])
-    all_entities = set(all_entities)
-    news_ids = [n['id'] for n in news_with_entities]
-    max_news_id = max(news_ids)
-    entity_ids = {ent: i for i, ent in enumerate(all_entities, max_news_id + 1)}
-    max_entities_id = max(entity_ids.values())
-    media_names = set([n['media'] for n in news_with_entities])
-    media_ids = {media: i for i, media in enumerate(media_names, max_entities_id + 1)}
-    
-    colors_for_nodes = {
-        ent_label: mpl.colors.rgb2hex(c) for ent_label, c in zip(entity_types_list, mpl.cm.get_cmap('tab20').colors)
-    }
-    # usar algún método chain para crear nodos con sus ids?
-    nodes = []
-    edges = []
-    for media in media_names:
-        media_dict = {
-            'id': media_ids[media],
-            'label': media,
-            'title': media,
-            'group': 'MEDIA',
-            'color': colors_for_nodes['MEDIA'],
-            'shape': 'dot',
-            'font': {'color': 'white'}
-        }
-        nodes.append(media_dict)
-    for news_dict in news_with_entities:
-        entity_news_dict = {
-            'id': news_dict['id'],
-            'title': news_dict['url'],
-            'label': news_dict['body_text'][:20],
-            'group': 'NEWS',
-            'color': colors_for_nodes['NEWS'],
-            'shape': 'dot',
-            'font': {'color': 'white'}
-        }
-        edges.append(
-            {
-                'label': 'PUBLICADO_POR',
-                'from': news_dict['id'],
-                'to': media_ids[news_dict['media']],
-                'arrows': 'to'
-            }
-        )
-        nodes.append(entity_news_dict)
-        for ent in news_dict['entities']:
-            if not ent['entity'] in [node['label'] for node in nodes]:
-                entity_ent_dict = {
-                    'id': entity_ids[ent['entity']],
-                    'label': ent['entity'],
-                    'group': 'ENTITY',
-                    'title': ent['entity_label'],
-                    'color': colors_for_nodes[ent['entity_label']],
-                    'shape': 'dot',
-                    'font': {'color': 'white'}
-                }
-                nodes.append(entity_ent_dict)
-            edges.append(
-                {
-                    'label': 'MENCIONADO_EN',
-                    'from': entity_ids[ent['entity']],
-                    'to': news_dict['id'],
-                    'arrows': 'to'
-                }
-            )
-    
-    network = DashNetwork(
-        id='kg_news-1',
-        style={
-            'height': '800px',
-            'width': '100%'
-        },
-        data={
-            'nodes': nodes,
-            'edges': edges
-        }
-    )
-    
-    return network
+def show_news_node_info(selected_node_dict):
+    if selected_node_dict:
+        print(selected_node_dict)
+        node_selected_id = selected_node_dict['nodes'][0]
+        print(node_selected_id)
+        for node_dict in data_for_kg['nodes']:
+            if node_dict['id'] == node_selected_id:
+                return f"{node_dict['title']}"
+    else:
+        return no_update
     
     
 if __name__ == '__main__':

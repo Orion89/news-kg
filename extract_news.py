@@ -60,6 +60,45 @@ def news_extractor_per_media(country: str, medias:dict, today:datetime, t_delta:
         conn.commit()
         
         
+def news_extractor_per_media_concurrent(country: str, media:str, today:datetime, t_delta:timedelta, conn):
+    # query
+    cursor = conn.cursor()
+    cursor.execute(f'''SELECT url FROM {"news_" + country}''')
+    saved_articles_urls = set([article[0] for article in cursor.fetchall()])
+    # scrapings
+    try:
+        media_news = newspaper.build(media, memoize_articles=False)
+    except Exception as e:
+        print(f"Ha ocurrido un error con {str(media)}:\n{e}")
+    else:
+        for art in media_news.articles:
+            try:
+                art.download()
+                art.parse()
+                if art.is_valid_body() and not art.is_media_news() and art.meta_lang == 'es' and art.publish_date >= (today - t_delta) and art.url not in saved_articles_urls:
+                    media_name = art.source_url.partition('//')[-1][:149] if art.source_url else None
+                    date = art.publish_date.strftime('%Y-%m-%d %H:%M:%S') if art.publish_date else None
+                    authors = ' '.join(art.authors)[:149] if art.authors else None
+                    url = art.url if art.url else None
+                    body_text = art.text
+                    keywords = ", ".join(art.keywords) if art.keywords else None
+                else:
+                    continue
+            except:
+                continue
+            else:
+                cursor.execute(
+                        f'''
+                        INSERT INTO {"news_" + country} (media_name, url, date, author, body, keywords)
+                        VALUES (%s, %s, %s, %s, %s, %s);
+                        ''',
+                        (media_name, url, date, authors, body_text, keywords)
+                    )
+                # print(f'Artículo de {media_name} agregado, medio de {country_media}')
+    conn.commit()
+    print(f'Concluida extracción de noticias de {media}')
+        
+        
 def get_news(connection, table_name:str='news_chile', n:int=10, year:int=None, day:int=None, month:int=None):
     cursor_pgsql = connection.cursor()
     fetched_ids = set()
