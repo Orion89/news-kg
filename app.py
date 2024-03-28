@@ -3,7 +3,7 @@ import warnings
 from dash import Dash, html, dcc, Input, Output, State, callback, no_update
 import dash
 import dash_bootstrap_components as dbc
-from dashvis import DashNetwork
+from dashvis import DashNetwork, stylesheets
 # import matplotlib as mpl
 from matplotlib.colors import rgb2hex
 from matplotlib.cm import get_cmap
@@ -16,14 +16,13 @@ from network_options.options import default_options_
 
 warnings.filterwarnings("ignore")
 
-colors = get_cmap('tab20').colors
-
 app = Dash(
     __name__,
     title='news graph',
     external_stylesheets=[
         dbc.themes.YETI,
-        dbc.icons.BOOTSTRAP
+        dbc.icons.BOOTSTRAP,
+        stylesheets.VIS_NETWORK_STYLESHEET
     ],
     meta_tags=[
         {'name': 'viewport',
@@ -31,9 +30,10 @@ app = Dash(
     ],
     # suppress_callback_exceptions=True
 )
-
+app.css.config.serve_locally = True
 # Initia KG
-data_for_kg = generate_kg(
+colors = get_cmap('tab20').colors
+data_for_kg, media_names = generate_kg(
     news_list=news_with_entities,
     entity_types=entity_types_list,
     colors=colors,
@@ -50,9 +50,11 @@ network_1 = DashNetwork(
                 'nodes': data_for_kg['nodes'],
                 'edges': data_for_kg['edges']
             },
-            options=default_options_
+            options=default_options_,
+            enableHciEvents=True,
+        enablePhysicsEvents=False,
+        enableOtherEvents=False
 )
-
 # Layout
 app.layout = dbc.Container(
     [
@@ -60,27 +62,30 @@ app.layout = dbc.Container(
         [
             dbc.Col(
                 [
-                    html.H1('Desentraña la red de noticias', className='text-center')
+                    html.H1('Desentraña la red de noticias', className='text-center text-primary fw-bolder')
                 ],
                 width={'size': 10, 'offset': 1}
             )
         ],
-        class_name='mt-1 mb-3 bg-light'
+        class_name='mt-1 mb-3'
     ),
         dbc.Row(
             [
                 dbc.Col(
                     [
-                        html.P("Visualiza los protagonistas de las noticias de hoy")
+                        html.P("Visualiza los protagonistas de las noticias de hoy", className='text-light')
                     ],
                     width={'size': 3, 'offset': 0}
                 ),
                 dbc.Col(
                     [
                         html.P(
-                            id='text-url-1'
+                            id='text-url-1',
+                            className='fs-6 text-white text-end'
                         )
-                    ]
+                    ],
+                    width={'size': 9},
+                    align='end'
                 )
             ]
         ),
@@ -89,17 +94,19 @@ app.layout = dbc.Container(
                 dbc.Col(
                     [
                         dbc.Spinner(
-                            html.Div(
+                            children=[html.Div(
                                     id='network-1',
                                     children=[network_1]
-                                ),
+                                )],
+                            id='spiner-1',
                             color='primary',
                             size='md'
                         )
                     ],
                     width={'size': 12}
                 )
-            ]
+            ],
+            class_name='mt-1 mb-3'
         ),
         dbc.Row(
             [
@@ -107,11 +114,11 @@ app.layout = dbc.Container(
                     [
                         dcc.Dropdown(
                             id='dropdown-1',
-                            options=[
-                                {'label': 'El Mercurio', 'value': 'El Mercurio'},
-                                {'label': 'La Discursión', 'value': 'La Discusión'}
+                            options=[{'label': 'Todos', 'value': 'Todos'}] + [
+                                {'label': str(m), 'value': str(m)} for m in media_names
                             ],
-                            value='El Mercurio'
+                            # value='Todos',
+                            placeholder="Selecciona un medio"
                         )
                     ],
                     width={'size': 4, 'offset': 0}
@@ -119,7 +126,8 @@ app.layout = dbc.Container(
             ]
         )
     ],
-    fluid=True
+    fluid=True,
+    class_name='bg-dark'
 )
 
 # Callbacks
@@ -240,14 +248,38 @@ app.layout = dbc.Container(
 )
 def show_news_node_info(selected_node_dict):
     if selected_node_dict:
-        print(selected_node_dict)
+        # print(selected_node_dict)
         node_selected_id = selected_node_dict['nodes'][0]
         print(node_selected_id)
         for node_dict in data_for_kg['nodes']:
-            if node_dict['id'] == node_selected_id:
+            if node_dict['id'] == node_selected_id and node_dict['title']:
                 return f"{node_dict['title']}"
+            else:
+                return ''
     else:
         return no_update
+    
+    
+@callback(
+    Output('kg_news-1', 'data'),
+    Input('dropdown-1', 'value'),
+    prevent_initial_call=True
+)
+def update_kg_1(selected_media):
+    if selected_media == 'Todos':
+        return {'nodes': data_for_kg['nodes'], 'edges': data_for_kg['edges']}
+    else:
+        news_with_entities_filtered = [
+            news_dict for news_dict in news_with_entities if news_dict['media'] == selected_media 
+        ]
+        data, _ = generate_kg(
+            news_list=news_with_entities_filtered,
+            entity_types=entity_types_list,
+            colors=colors,
+            color_converter=rgb2hex
+        )
+    
+        return {'nodes': data['nodes'], 'edges': data['edges']}
     
     
 if __name__ == '__main__':

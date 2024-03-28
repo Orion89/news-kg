@@ -99,15 +99,26 @@ def news_extractor_per_media_concurrent(country: str, media:str, today:datetime,
     print(f'Concluida extracción de noticias de {media}')
         
         
-def get_news(connection, table_name:str='news_chile', n:int=10, year:int=None, day:int=None, month:int=None):
+def get_news(connection, table_name:str='news_chile', n:int=10, year:int=None, day:int=None, month:int=None, media_name:str=None):
     cursor_pgsql = connection.cursor()
     fetched_ids = set()
     fetched_ids.add(-1)
-    if year and month:
+    if year and month and day:
         query = f'''
         SELECT id, date, media_name, url, body, keywords
         FROM {table_name}
         WHERE id NOT IN ({re.sub(pattern=r"[{}]", repl="", string=str(fetched_ids))})
+        AND EXTRACT(YEAR FROM date) >= {year}
+        AND EXTRACT(MONTH FROM date) >= {month}
+        AND EXTRACT(DAY FROM date) >= {day}
+        LIMIT {str(n)}
+        '''
+    elif year and month and day and media_name:
+        query = f'''
+        SELECT id, date, media_name, url, body, keywords
+        FROM {table_name}
+        WHERE id NOT IN ({re.sub(pattern=r"[{}]", repl="", string=str(fetched_ids))})
+        AND media_name = {media_name}
         AND EXTRACT(YEAR FROM date) >= {year}
         AND EXTRACT(MONTH FROM date) >= {month}
         AND EXTRACT(DAY FROM date) >= {day}
@@ -125,6 +136,7 @@ def get_news(connection, table_name:str='news_chile', n:int=10, year:int=None, d
         for results in cursor_pgsql.fetchall(): 
             news_id, news_date, media_name, news_url, news_text, keywords = results
             yield (news_id, news_date, media_name, news_url, news_text, keywords)
+            # print(f'Recuperada noticia de fecha {str(news_date)}')
             fetched_ids.add(news_id)
     except Exception as e:
         print(f'An error has ocurred: {e}')
