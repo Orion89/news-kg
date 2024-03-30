@@ -8,10 +8,13 @@ from dashvis import DashNetwork, stylesheets
 from matplotlib.colors import rgb2hex
 from matplotlib.cm import get_cmap
 
-from extract_entities import news_with_entities
+import pytextrank
+
+from extract_entities import news_with_entities, nlp
 from generate_networks import generate_kg
 from utils import entity_types_list
 from network_options.options import default_options_
+from sections.header import header
 
 
 warnings.filterwarnings("ignore")
@@ -31,6 +34,7 @@ app = Dash(
     # suppress_callback_exceptions=True
 )
 app.css.config.serve_locally = True
+nlp.add_pipe("textrank")
 # Initia KG
 colors = get_cmap('tab20').colors
 data_for_kg, media_names = generate_kg(
@@ -64,10 +68,15 @@ app.layout = dbc.Container(
                 [
                     html.H1('Desentraña la red de noticias', className='text-center text-primary fw-bolder')
                 ],
-                width={'size': 10, 'offset': 1}
+                width={'size': 8, 'offset': 0}
+            ),
+            dbc.Col(
+                [
+                    header
+                ]
             )
         ],
-        class_name='mt-1 mb-3'
+        class_name='mt-2 mb-3'
     ),
         dbc.Row(
             [
@@ -122,12 +131,76 @@ app.layout = dbc.Container(
                         )
                     ],
                     width={'size': 4, 'offset': 0}
+                ),
+                dbc.Col(
+                    [
+                        dcc.Dropdown(
+                            id='dropdown-2',
+                            clearable=False,
+                            multi=True,
+                            searchable=False,
+                            placeholder='Keywords de noticia seleccionada'
+                        )
+                    ]
                 )
             ]
+        ),
+        dbc.Row( # FOOTER
+            [
+                dbc.Col(
+                    [
+                        # html.Div(id='user-info', className='invisible m-0'),
+                        dbc.Card(
+                            [
+                                dbc.CardFooter(
+                                    [
+                                        html.P([
+                                            html.A(
+                                                children=[html.I(className="bi bi-github")],
+                                                disable_n_clicks=True,
+                                                href='https://github.com/Orion89',
+                                                title="GitHub profile"
+                                            ),
+                                            "  ",
+                                            html.A(
+                                                children=[html.I(className="bi bi-linkedin")],
+                                                disable_n_clicks=True,
+                                                href='https://www.linkedin.com/in/leonardo-molina-v-68a601183/',
+                                                title="LinkedIn profile"
+                                            ),
+                                            " 2024 Leonardo Molina V."
+                                            ],
+                                            className='fs-5 text-light'
+                                        ),
+                                        html.P(
+                                            'Proyecto académico. El autor no se hace responsable del mal uso del contenido.',
+                                            className='text-light'
+                                        )
+                                    ]
+                                    
+                                )
+                            ],
+                            style={
+                                'background': '#222222'
+                            }
+                        )
+                    ],
+                    class_name='mt-4',
+                    width={'size': 12},
+                )
+            ],
+            align='center',
+            class_name='text-end',
+            style={
+                'background': '#222222'
+            }
         )
     ],
     fluid=True,
-    class_name='bg-dark'
+    style={
+        'background': '#222222'
+    }
+    # class_name='bg-dark'
 )
 
 # Callbacks
@@ -244,20 +317,43 @@ app.layout = dbc.Container(
 @callback(
     Output('text-url-1', 'children'),
     Input('kg_news-1', 'selectNode'),
-    # prevent_initial_call=True
+    prevent_initial_call=True
 )
 def show_news_node_info(selected_node_dict):
     if selected_node_dict:
         # print(selected_node_dict)
         node_selected_id = selected_node_dict['nodes'][0]
-        print(node_selected_id)
-        for node_dict in data_for_kg['nodes']:
-            if node_dict['id'] == node_selected_id and node_dict['title']:
-                return f"{node_dict['title']}"
-            else:
-                return ''
+        # print(node_selected_id)
+        selected_node = [node_dict for node_dict in data_for_kg['nodes'] if node_dict['id'] == node_selected_id][0]
+        if selected_node['title']:
+            return f"{selected_node['title']}"
+        else:
+            return ''
     else:
         return no_update
+    
+    
+@callback(
+    Output('dropdown-2', 'options'),
+    Output('dropdown-2', 'value'),
+    Input('kg_news-1', 'selectNode'),
+    prevent_initial_call=True
+)
+def get_keywords(selected_node_dict):
+    n = 5
+    node_selected_id = selected_node_dict['nodes'][0]
+    selected_news = [news_dict for news_dict in news_with_entities if news_dict['id'] == node_selected_id][0]
+    if selected_news['body_text']:
+        doc_ = nlp(selected_news['body_text'])
+        options = []
+        value = []
+        for kw in doc_._.phrases[:n]:
+            if kw.text not in [token for token in doc_ if not token.is_stop]:
+                options.append({'label': kw.text, 'value': kw.text})
+                value.append(kw.text)
+        return options, value
+    else:
+        return [{'label': '', 'value': ''}], ['']
     
     
 @callback(

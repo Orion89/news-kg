@@ -46,6 +46,7 @@ def generate_kg(news_list:list=None, entity_types:list=None, colors:list=None, c
                 'size': 17
             }
         }
+        nodes.append(entity_news_dict)
         edge_id = next(gen_id)
         if (news_dict['id'], media_ids[news_dict['media']]) not in set([(edge_dict['from'], edge_dict['to']) for edge_dict in edges]):
             edges.append(
@@ -62,7 +63,6 @@ def generate_kg(news_list:list=None, entity_types:list=None, colors:list=None, c
                     }
                 }
             )
-        nodes.append(entity_news_dict)
         for ent in news_dict['entities']:
             if not ent['entity'] in [node['label'] for node in nodes]:
                 entity_ent_dict = {
