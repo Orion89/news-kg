@@ -4,3 +4,4 @@ Pipfile.lock
 .env
 visualizaciones
 bd.ipynb
+.ipynb_checkpoints

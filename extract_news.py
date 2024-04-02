@@ -60,16 +60,14 @@ def news_extractor_per_media(country: str, medias:dict, today:datetime, t_delta:
         conn.commit()
         
         
-def news_extractor_per_media_concurrent(country: str, media:str, today:datetime, t_delta:timedelta, conn):
+def news_extractor_per_media_concurrent(media:str, today:datetime, t_delta:timedelta, conn):
     # query
-    cursor = conn.cursor()
-    cursor.execute(f'''SELECT url FROM {"news_" + country}''')
-    saved_articles_urls = set([article[0] for article in cursor.fetchall()])
+    saved_articles_urls = set([article[0] for article in conn.execute(f'''SELECT url FROM news_chile''').fetchall()])
     # scrapings
     try:
         media_news = newspaper.build(media, memoize_articles=False)
-    except Exception as e:
-        print(f"Ha ocurrido un error con {str(media)}:\n{e}")
+    except Exception as e1:
+        print(f"Ha ocurrido un error con {str(media)}:\n\t{e1}")
     else:
         for art in media_news.articles:
             try:
@@ -84,12 +82,13 @@ def news_extractor_per_media_concurrent(country: str, media:str, today:datetime,
                     keywords = ", ".join(art.keywords) if art.keywords else None
                 else:
                     continue
-            except:
+            except Exception as e2:
+                print(f'Ha ocurrido un error al descargar un artículo de {media}:\n\t{e2}')
                 continue
             else:
-                cursor.execute(
+                conn.execute(
                         f'''
-                        INSERT INTO {"news_" + country} (media_name, url, date, author, body, keywords)
+                        INSERT INTO news_chile (media_name, url, date, author, body, keywords)
                         VALUES (%s, %s, %s, %s, %s, %s);
                         ''',
                         (media_name, url, date, authors, body_text, keywords)
