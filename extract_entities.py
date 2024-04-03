@@ -10,7 +10,7 @@ nlp = spacy.load('es_core_news_md')
 tz = timezone('UTC')
 today = datetime.today()
 today = today.replace(tzinfo=tz)
-time_delta = timedelta(days=1, hours=today.hour, minutes=today.minute)
+time_delta = timedelta(days=3, hours=today.hour, minutes=today.minute)
 n = 120
 
 extracted_raw_news = get_news(
