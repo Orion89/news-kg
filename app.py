@@ -11,7 +11,8 @@ from matplotlib.cm import get_cmap
 
 import pytextrank
 
-from extract_entities import news_with_entities, nlp
+from extract.extract_entities import news_with_entities, nlp
+from extract.extract_news import get_news
 from generate_networks import generate_kg
 from utils.utils import entity_types_list
 from utils.get_size import getsize
@@ -86,7 +87,7 @@ app.layout = dbc.Container(
             [
                 dbc.Col(
                     [
-                        html.P("Visualiza los protagonistas de las noticias de hoy", className='text-light'),
+                        html.P("Haz zoom y/o selecciona un nodo para ver más información.", className='text-light'),
                         modal
                     ],
                     width={'size': 3, 'offset': 0}

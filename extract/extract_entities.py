@@ -2,7 +2,7 @@ from datetime import datetime
 from datetime import timedelta
 from pytz import timezone
 
-from extract_news import conn_postgresql, get_news
+from extract.extract_news import conn_postgresql, get_news
 import spacy
 
 nlp = spacy.load('es_core_news_md')
