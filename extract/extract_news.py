@@ -141,3 +141,22 @@ def get_news(connection, table_name:str='news_chile', n:int=10, year:int=None, d
         print(f'An error has ocurred: {e}')
         cursor_pgsql.execute('ROLLBACK;')
         cursor_pgsql.close()
+        
+        
+def get_media_in_db(conn:psycopg.Connection, year=None, month=None, day=None) -> list:
+    query = f'''
+        SELECT DISTINCT media_name FROM news_chile
+    '''.strip()
+    unique_media_list = conn.execute(query=query).fetchall()
+    return [media_name[0] for media_name in unique_media_list]
+
+
+# def get_media_in_db(conn:psycopg.Connection, year=None, month=None, day=None) -> list:
+#     query = f'''
+#         SELECT DISTINCT media_name FROM news_chile
+#         WHERE EXTRACT(YEAR FROM date) >= {year}
+#         AND EXTRACT(MONTH FROM date) >= {month}
+#         AND EXTRACT(DAY FROM date) >= {day}
+#     '''.strip()
+#     unique_media_list = conn.execute(query=query).fetchall()
+#     return unique_media_list

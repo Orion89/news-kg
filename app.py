@@ -1,4 +1,6 @@
-from sys import getsizeof
+from datetime import datetime
+from datetime import timedelta
+from pytz import timezone
 import warnings
 
 from dash import Dash, html, dcc, Input, Output, State, callback, no_update
@@ -11,8 +13,8 @@ from matplotlib.cm import get_cmap
 
 import pytextrank
 
-from extract.extract_entities import news_with_entities, nlp
-from extract.extract_news import get_news
+from extract.extract_entities import news_with_entities, nlp, extract_entities_spacy
+from extract.extract_news import get_news, conn_postgresql, get_media_in_db
 from generate_networks import generate_kg
 from utils.utils import entity_types_list
 from utils.get_size import getsize
@@ -42,7 +44,7 @@ app.css.config.serve_locally = True
 nlp.add_pipe("textrank")
 # Initia KG
 colors = get_cmap('tab20').colors
-data_for_kg, media_names = generate_kg(
+data_for_kg, _ = generate_kg(
     news_list=news_with_entities,
     entity_types=entity_types_list,
     colors=colors,
@@ -64,6 +66,13 @@ network_1 = DashNetwork(
         enablePhysicsEvents=False,
         enableOtherEvents=False
 )
+
+today = datetime.today()
+tz = timezone('UTC')
+today = today.replace(tzinfo=tz)
+time_delta = timedelta(days=7, hours=today.hour, minutes=today.minute)
+media_names = get_media_in_db(conn_postgresql, year=today.year, month=today.month, day=(today - time_delta).day)
+
 # Layout
 app.layout = dbc.Container(
     [
@@ -274,9 +283,29 @@ def update_kg_1(selected_media):
     if selected_media == 'Todos':
         return {'nodes': data_for_kg['nodes'], 'edges': data_for_kg['edges']}, news_with_entities
     else:
-        news_with_entities_filtered = [
-            news_dict for news_dict in news_with_entities if news_dict['media'] == selected_media 
-        ]
+        print(f'Se ha seleccionado un medio: {selected_media}')
+        # news_with_entities_filtered = [
+        #     news_dict for news_dict in news_with_entities if news_dict['media'] == selected_media 
+        # ]
+        n = 100
+        today = datetime.today()
+        tz = timezone('UTC')
+        today = today.replace(tzinfo=tz)
+        time_delta = timedelta(days=1, hours=today.hour, minutes=today.minute)
+        extracted_raw_news = get_news(
+            connection=conn_postgresql,
+            table_name='news_chile',
+            year=today.year,
+            month=today.month,
+            day=(today - time_delta).day,
+            media_name=selected_media,
+            n=n
+        )
+        news_with_entities_filtered = extract_entities_spacy(
+            extracted_raw_news=extracted_raw_news,
+            nlp=nlp
+        )
+        
         data, _ = generate_kg(
             news_list=news_with_entities_filtered,
             entity_types=entity_types_list,
