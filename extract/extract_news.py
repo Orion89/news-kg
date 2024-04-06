@@ -102,7 +102,7 @@ def get_news(connection, table_name:str='news_chile', n:int=10, year:int=None, d
     cursor_pgsql = connection.cursor()
     fetched_ids = set()
     fetched_ids.add(-1)
-    if year and month and day:
+    if year and month and day and not media_name:
         query = f'''
         SELECT id, date, media_name, url, body, keywords
         FROM {table_name}
@@ -117,7 +117,7 @@ def get_news(connection, table_name:str='news_chile', n:int=10, year:int=None, d
         SELECT id, date, media_name, url, body, keywords
         FROM {table_name}
         WHERE id NOT IN ({re.sub(pattern=r"[{}]", repl="", string=str(fetched_ids))})
-        AND media_name = {media_name}
+        AND media_name = '{media_name}'
         AND EXTRACT(YEAR FROM date) >= {year}
         AND EXTRACT(MONTH FROM date) >= {month}
         AND EXTRACT(DAY FROM date) >= {day}

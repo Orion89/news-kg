@@ -20,7 +20,7 @@ from utils.utils import entity_types_list
 from utils.get_size import getsize
 from network_options.options import default_options_
 from sections.header import header
-from sections.modals import modal
+from sections.modals import modal, modal_no_news
 
 
 warnings.filterwarnings("ignore")
@@ -124,8 +124,10 @@ app.layout = dbc.Container(
                                 )],
                             id='spiner-1',
                             color='primary',
+                            delay_show=5_000,
                             size='md'
-                        )
+                        ),
+                        modal_no_news
                     ],
                     width={'size': 12}
                 )
@@ -233,14 +235,14 @@ def show_news_node_info(selected_node_dict):
         selected_node = [node_dict for node_dict in data_for_kg['nodes'] if node_dict['id'] == node_selected_id]
         if selected_node:
             selected_node = selected_node[0]
-            if selected_node['title']:
+            if selected_node['title'] not in entity_types_list:
                 return f"{selected_node['title']}"
             else:
                 return ''
         else:
             return ''
     else:
-        return no_update
+        return '' # no_update
     
     
 @callback(
@@ -276,12 +278,13 @@ def get_keywords(selected_node_dict, data):
 @callback(
     Output('kg_news-1', 'data'),
     Output('store-1', 'data'),
+    Output('modal-2', 'is_open', allow_duplicate=True),
     Input('dropdown-1', 'value'),
     prevent_initial_call=True
 )
 def update_kg_1(selected_media):
     if selected_media == 'Todos':
-        return {'nodes': data_for_kg['nodes'], 'edges': data_for_kg['edges']}, news_with_entities
+        return {'nodes': data_for_kg['nodes'], 'edges': data_for_kg['edges']}, news_with_entities, False
     else:
         print(f'Se ha seleccionado un medio: {selected_media}')
         # news_with_entities_filtered = [
@@ -291,7 +294,7 @@ def update_kg_1(selected_media):
         today = datetime.today()
         tz = timezone('UTC')
         today = today.replace(tzinfo=tz)
-        time_delta = timedelta(days=1, hours=today.hour, minutes=today.minute)
+        time_delta = timedelta(days=4, hours=today.hour, minutes=today.minute)
         extracted_raw_news = get_news(
             connection=conn_postgresql,
             table_name='news_chile',
@@ -301,10 +304,14 @@ def update_kg_1(selected_media):
             media_name=selected_media,
             n=n
         )
-        news_with_entities_filtered = extract_entities_spacy(
-            extracted_raw_news=extracted_raw_news,
-            nlp=nlp
-        )
+        try:
+            news_with_entities_filtered = extract_entities_spacy(
+                extracted_raw_news=extracted_raw_news,
+                nlp=nlp
+            )
+        except Exception as e:
+            print(f'An error has ocurred in getting news from {selected_media}:\n{e}')
+            return no_update, no_update, True
         
         data, _ = generate_kg(
             news_list=news_with_entities_filtered,
@@ -313,7 +320,27 @@ def update_kg_1(selected_media):
             color_converter=rgb2hex
         )
     
-        return {'nodes': data['nodes'], 'edges': data['edges']}, news_with_entities_filtered
+        return {'nodes': data['nodes'], 'edges': data['edges']}, news_with_entities_filtered, False
+    
+
+@callback(
+    Output('modal-1', 'is_open'),
+    Input('modal-close-1', 'n_clicks'),
+    prevent_initial_call=True
+)
+def control_modal_1(click_button):
+    if click_button:
+        return False
+
+    
+@callback(
+    Output('modal-2', 'is_open'),
+    Input('modal-close-2', 'n_clicks'),
+    prevent_initial_call=True
+)
+def control_modal_2(click_button):
+    if click_button:
+        return False
     
     
 if __name__ == '__main__':

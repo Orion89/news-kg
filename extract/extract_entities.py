@@ -11,9 +11,9 @@ tz = timezone('UTC')
 today = datetime.today()
 today = today.replace(tzinfo=tz)
 time_delta = timedelta(days=4, hours=today.hour, minutes=today.minute)
-n = 120
+n = 100
 
-def extract_entities_spacy(extracted_raw_news:list=None, nlp=None) -> list:
+def extract_entities_spacy(extracted_raw_news=None, nlp=None) -> list:
     news_with_entities = []
     for (news_id, news_date, media_name, news_url, news_text, keywords) in extracted_raw_news:
         doc = nlp(news_text)
@@ -39,12 +39,5 @@ extracted_raw_news = get_news(
     day=(today - time_delta).day,
     n=n
 )
-
-if not len(list(extracted_raw_news)):
-        extracted_raw_news = get_news(
-        connection=conn_postgresql,
-        table_name='news_chile',
-        n=n
-    )
 
 news_with_entities = extract_entities_spacy(extracted_raw_news=extracted_raw_news, nlp=nlp)
