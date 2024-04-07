@@ -1,5 +1,6 @@
 from datetime import datetime
 from datetime import timedelta
+import os
 from pytz import timezone
 import warnings
 
@@ -13,6 +14,7 @@ from matplotlib.cm import get_cmap
 
 import pytextrank
 
+from config.db import conn
 from extract.extract_entities import news_with_entities, nlp, extract_entities_spacy
 from extract.extract_news import get_news, conn_postgresql, get_media_in_db
 from generate_networks import generate_kg
@@ -41,6 +43,7 @@ app = Dash(
 )
 
 app.css.config.serve_locally = True
+server = app.server
 nlp.add_pipe("textrank")
 # Initia KG
 colors = get_cmap('tab20').colors
@@ -71,7 +74,7 @@ today = datetime.today()
 tz = timezone('UTC')
 today = today.replace(tzinfo=tz)
 time_delta = timedelta(days=7, hours=today.hour, minutes=today.minute)
-media_names = get_media_in_db(conn_postgresql, year=today.year, month=today.month, day=(today - time_delta).day)
+media_names = get_media_in_db(conn, year=today.year, month=today.month, day=(today - time_delta).day)
 
 # Layout
 app.layout = dbc.Container(
@@ -296,7 +299,7 @@ def update_kg_1(selected_media):
         today = today.replace(tzinfo=tz)
         time_delta = timedelta(days=4, hours=today.hour, minutes=today.minute)
         extracted_raw_news = get_news(
-            connection=conn_postgresql,
+            connection=conn,
             table_name='news_chile',
             year=today.year,
             month=today.month,
@@ -343,5 +346,5 @@ def control_modal_2(click_button):
         return False
     
     
-if __name__ == '__main__':
-    app.run(debug=True, port='8050')
+if __name__ == "__main__":
+    app.run(debug=False, host=os.getenv("HOST", default='0.0.0.0'), port=os.getenv("PORT", default='8050'))

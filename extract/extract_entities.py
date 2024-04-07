@@ -3,6 +3,7 @@ from datetime import timedelta
 from pytz import timezone
 
 from extract.extract_news import conn_postgresql, get_news
+from config.db import conn
 import spacy
 
 nlp = spacy.load('es_core_news_md')
@@ -10,7 +11,7 @@ nlp = spacy.load('es_core_news_md')
 tz = timezone('UTC')
 today = datetime.today()
 today = today.replace(tzinfo=tz)
-time_delta = timedelta(days=4, hours=today.hour, minutes=today.minute)
+time_delta = timedelta(days=2, hours=today.hour, minutes=today.minute)
 n = 100
 
 def extract_entities_spacy(extracted_raw_news=None, nlp=None) -> list:
@@ -32,7 +33,7 @@ def extract_entities_spacy(extracted_raw_news=None, nlp=None) -> list:
 
 
 extracted_raw_news = get_news(
-    connection=conn_postgresql,
+    connection=conn, # conn_postgresql
     table_name='news_chile',
     year=today.year,
     month=today.month,
