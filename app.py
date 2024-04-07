@@ -16,7 +16,7 @@ import pytextrank
 
 from config.db import conn
 from extract.extract_entities import news_with_entities, nlp, extract_entities_spacy
-from extract.extract_news import get_news, conn_postgresql, get_media_in_db
+from extract.extract_news import get_news, get_media_in_db
 from generate_networks import generate_kg
 from utils.utils import entity_types_list
 from utils.get_size import getsize

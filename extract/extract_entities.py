@@ -2,7 +2,7 @@ from datetime import datetime
 from datetime import timedelta
 from pytz import timezone
 
-from extract.extract_news import conn_postgresql, get_news
+from extract.extract_news import get_news
 from config.db import conn
 import spacy
 

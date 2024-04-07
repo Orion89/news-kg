@@ -12,12 +12,12 @@ tz = timezone('UTC')
 today = today.replace(tzinfo=tz)
 time_delta = timedelta(days=1, hours=today.hour, minutes=today.minute)
 
-conn_postgresql = psycopg.connect(
-    host="localhost",
-    dbname="news_kg_v1",
-    user="postgres",
-    password="0rioN-689"
-)
+# conn_postgresql = psycopg.connect(
+#     host="localhost",
+#     dbname="news_kg_v1",
+#     user="postgres",
+#     password="0rioN-689"
+# )
 
 
 def news_extractor_per_media(country: str, medias:dict, today:datetime, t_delta:timedelta, conn):
