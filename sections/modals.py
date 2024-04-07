@@ -15,7 +15,7 @@ modal = dbc.Modal(
             class_name='bg-light'
         ),
         dbc.ModalFooter(
-            dbc.Button("Cerrar", id="modal-close-1", className="ml-auto text-info fw-bold", n_clicks=0),
+            dbc.Button("Cerrar", id="modal-close-1", className="ml-auto text-info fw-bold"),
             class_name='bg-light'
         ),
     ],

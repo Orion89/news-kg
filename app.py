@@ -16,7 +16,7 @@ import pytextrank
 
 from config.db import conn
 from extract.extract_entities import news_with_entities, nlp, extract_entities_spacy
-from extract.extract_news import get_news, get_media_in_db
+from extract.extract_news import get_news, get_media_in_db, tz, today, time_delta, n
 from generate_networks import generate_kg
 from utils.utils import entity_types_list
 from utils.get_size import getsize
@@ -27,6 +27,7 @@ from sections.modals import modal, modal_no_news
 
 warnings.filterwarnings("ignore")
 
+# app initializing and options
 app = Dash(
     __name__,
     title='news graph',
@@ -45,7 +46,7 @@ app = Dash(
 app.css.config.serve_locally = True
 server = app.server
 nlp.add_pipe("textrank")
-# Initia KG
+# Initialize KG
 colors = get_cmap('tab20').colors
 data_for_kg, _ = generate_kg(
     news_list=news_with_entities,
@@ -69,11 +70,7 @@ network_1 = DashNetwork(
         enablePhysicsEvents=False,
         enableOtherEvents=False
 )
-
-today = datetime.today()
-tz = timezone('UTC')
-today = today.replace(tzinfo=tz)
-time_delta = timedelta(days=7, hours=today.hour, minutes=today.minute)
+# media in bd
 media_names = get_media_in_db(conn, year=today.year, month=today.month, day=(today - time_delta).day)
 
 # Layout
@@ -83,7 +80,7 @@ app.layout = dbc.Container(
         [
             dbc.Col(
                 [
-                    html.H1('Desentraña la red de noticias', className='text-center text-primary fw-bolder')
+                    html.H1('Desentraña la red de noticias', className='text-start text-primary fw-bolder')
                 ],
                 width={'size': 8, 'offset': 0}
             ),

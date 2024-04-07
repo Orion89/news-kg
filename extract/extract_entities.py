@@ -2,17 +2,12 @@ from datetime import datetime
 from datetime import timedelta
 from pytz import timezone
 
-from extract.extract_news import get_news
+from extract.extract_news import get_news, tz, today, time_delta, n
 from config.db import conn
 import spacy
 
 nlp = spacy.load('es_core_news_md')
 
-tz = timezone('UTC')
-today = datetime.today()
-today = today.replace(tzinfo=tz)
-time_delta = timedelta(days=2, hours=today.hour, minutes=today.minute)
-n = 100
 
 def extract_entities_spacy(extracted_raw_news=None, nlp=None) -> list:
     news_with_entities = []
