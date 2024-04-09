@@ -3,6 +3,8 @@ from datetime import timedelta
 import os
 from pytz import timezone
 import warnings
+from dotenv import load_dotenv
+load_dotenv()
 
 from dash import Dash, html, dcc, Input, Output, State, callback, no_update
 import dash
@@ -16,7 +18,7 @@ import pytextrank
 
 from config.db import conn
 from extract.extract_entities import news_with_entities, nlp, extract_entities_spacy
-from extract.extract_news import get_news, get_media_in_db, tz, today, time_delta, n
+from extract.extract_news import get_news, get_media_in_db, today, time_delta, n
 from generate_networks import generate_kg
 from utils.utils import entity_types_list
 from utils.get_size import getsize
@@ -34,7 +36,8 @@ app = Dash(
     external_stylesheets=[
         dbc.themes.YETI,
         dbc.icons.BOOTSTRAP,
-        stylesheets.VIS_NETWORK_STYLESHEET
+        stylesheets.VIS_NETWORK_STYLESHEET,
+        dbc.icons.BOOTSTRAP
     ],
     meta_tags=[
         {'name': 'viewport',
@@ -55,20 +58,20 @@ data_for_kg, _ = generate_kg(
     color_converter=rgb2hex
 )
 network_1 = DashNetwork(
-            id='kg_news-1',
-            style={
-                'height': '800px',
-                'width': '100%',
-                'background': "#222222"
-            },
-            data={
-                'nodes': data_for_kg['nodes'],
-                'edges': data_for_kg['edges']
-            },
-            options=default_options_,
-            enableHciEvents=True,
-        enablePhysicsEvents=False,
-        enableOtherEvents=False
+    id='kg_news-1',
+    style={
+        'height': '800px',
+        'width': '100%',
+        'background': "#222222"
+    },
+    data={
+        'nodes': data_for_kg['nodes'],
+        'edges': data_for_kg['edges']
+    },
+    options=default_options_,
+    enableHciEvents=True,
+    enablePhysicsEvents=False,
+    enableOtherEvents=False
 )
 # media in bd
 media_names = get_media_in_db(conn, year=today.year, month=today.month, day=(today - time_delta).day)
@@ -80,7 +83,7 @@ app.layout = dbc.Container(
         [
             dbc.Col(
                 [
-                    html.H1('Desentraña la red de noticias', className='text-start text-primary fw-bolder')
+                    html.H1('Desentraña la red de noticias', className='text-start text-primary fw-bolder', id='title-1')
                 ],
                 width={'size': 8, 'offset': 0}
             ),
@@ -90,7 +93,7 @@ app.layout = dbc.Container(
                 ]
             )
         ],
-        class_name='mt-2 mb-3'
+        class_name='mt-1 mb-3 pt-3'
     ),
         dbc.Row(
             [
@@ -115,24 +118,74 @@ app.layout = dbc.Container(
         ),
         dbc.Row(
             [
+                # dbc.Col(
+                #     [
+                #        dcc.Dropdown(
+                #             id='dropdown-3',
+                #             clearable=False,
+                #             multi=True,
+                #             searchable=False,
+                #             placeholder='Keywords de noticia seleccionada',
+                #             maxHeight=800,
+                #             className='bg-opacity-0 z-3 position-absolute',
+                #             style={
+                #                 'backgroundColor': 'transparent',
+                #                 'width': '250px'
+                #             #     'opacity': 0,
+                #                 # 'position': 'absolute',
+                #                 # 'left': 0,
+                #                 # 'width': '100%',
+                #             }
+                #         )
+                #     ],
+                #     width={'size': 2, 'offset': 0},
+                #     class_name='bg-opacity-0',
+                #     align="start"
+                # ),
                 dbc.Col(
                     [
+                        dcc.Dropdown(
+                            id='dropdown-3',
+                            clearable=False,
+                            multi=True,
+                            searchable=False,
+                            placeholder='Keywords de noticia seleccionada',
+                            maxHeight=800,
+                            className='bg-opacity-0 z-3 position-absolute',
+                            style={
+                                'backgroundColor': 'transparent',
+                                'width': '250px'
+                            #     'opacity': 0,
+                                # 'position': 'absolute',
+                                # 'left': 0,
+                                # 'width': '100%',
+                            }
+                        ),
                         dbc.Spinner(
-                            children=[html.Div(
+                            children=[
+                                html.Div(
+                                    children=[
+                                        network_1
+                                    ],
                                     id='network-1',
-                                    children=[network_1]
-                                )],
+                                    className='mt-0'
+                                )
+                            ],
                             id='spiner-1',
                             color='primary',
-                            delay_show=5_000,
+                            delay_show=7_000,
                             size='md'
                         ),
                         modal_no_news
                     ],
-                    width={'size': 12}
+                    width={'size': 12, 'offset': 0},
+                    align="start"
                 )
             ],
-            class_name='mt-1 mb-3'
+            class_name='mt-1 mb-3',
+            # style={
+            #     'position': 'relative'
+            # }
         ),
         dbc.Row(
             [
@@ -141,10 +194,15 @@ app.layout = dbc.Container(
                         dcc.Dropdown(
                             id='dropdown-1',
                             options=[{'label': 'Todos', 'value': 'Todos'}] + [
-                                {'label': str(m), 'value': str(m)} for m in media_names
+                                {'label': html.Span([html.I(className='bi bi-book'), f'{str(m)}'], style={'color': 'white', 'font-size': 16}), 
+                                 'value': str(m)} for m in media_names
                             ],
                             # value='Todos',
-                            placeholder="Selecciona un medio"
+                            placeholder="Selecciona un medio",
+                            className='bg-opacity-0',
+                            style={
+                                'backgroundColor': 'transparent'
+                            }
                         ),
                         dcc.Store(id='store-1', storage_type='session')
                     ],
@@ -236,7 +294,7 @@ def show_news_node_info(selected_node_dict):
         if selected_node:
             selected_node = selected_node[0]
             if selected_node['title'] not in entity_types_list:
-                return f"{selected_node['title']}"
+                return html.A(children=[f"{selected_node['title']}"], href=f"{selected_node['title']}", target='_blank')
             else:
                 return ''
         else:
@@ -276,6 +334,36 @@ def get_keywords(selected_node_dict, data):
     
     
 @callback(
+    Output('dropdown-3', 'options'),
+    Output('dropdown-3', 'value'),
+    Input('kg_news-1', 'selectNode'),
+    State('store-1', 'data'),
+    prevent_initial_call=True
+)
+def get_keywords(selected_node_dict, data):
+    if not data:
+        data = news_with_entities # return [{'label': '', 'value': ''}], ['']
+    n = 5
+    node_selected_id = selected_node_dict['nodes'][0]
+    selected_news = [news_dict for news_dict in data if news_dict['id'] == node_selected_id]
+    if selected_news:
+        selected_news = selected_news[0]
+    else:
+        return [{'label': '', 'value': '', }], ['']
+    if selected_news['body_text']:
+        doc_ = nlp(selected_news['body_text'])
+        options = []
+        value = []
+        for kw in doc_._.phrases[:n]:
+            if kw.text not in [token for token in doc_ if not token.is_stop]:
+                options.append({'label': html.Span([html.I(className='bi bi-bookmark-dash'), f'{kw.text}'], style={'color': 'white', 'font-size': 16}), 'value': kw.text})
+                value.append(kw.text)
+        return options, value
+    else:
+        return [{'label': '', 'value': ''}], ['']
+
+
+@callback(
     Output('kg_news-1', 'data'),
     Output('store-1', 'data'),
     Output('modal-2', 'is_open', allow_duplicate=True),
@@ -312,6 +400,9 @@ def update_kg_1(selected_media):
         except Exception as e:
             print(f'An error has ocurred in getting news from {selected_media}:\n{e}')
             return no_update, no_update, True
+        if len(news_with_entities_filtered) == 0:
+            print(f'\t{selected_media} sin artículos disponibles')
+            return no_update, no_update, True
         
         data, _ = generate_kg(
             news_list=news_with_entities_filtered,
@@ -344,4 +435,4 @@ def control_modal_2(click_button):
     
     
 if __name__ == "__main__":
-    app.run(debug=False, host=os.getenv("HOST", default='0.0.0.0'), port=os.getenv("PORT", default='8050'))
+    app.run(debug=True, host=os.getenv("HOST", default='localhost'), port=os.getenv("PORT", default='8050')) # host=os.getenv("HOST", default='0.0.0.0'),
