@@ -10,7 +10,7 @@ import psycopg
 today = datetime.today()
 tz = timezone('UTC')
 today = today.replace(tzinfo=tz)
-time_delta = timedelta(days=2, hours=today.hour, minutes=today.minute)
+time_delta = timedelta(days=10, hours=today.hour, minutes=today.minute)
 n = 100
 
 # conn_postgresql = psycopg.connect(

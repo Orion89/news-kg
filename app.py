@@ -18,7 +18,7 @@ import pytextrank
 
 from config.db import conn
 from extract.extract_entities import news_with_entities, nlp, extract_entities_spacy
-from extract.extract_news import get_news, get_media_in_db, tz, today, time_delta, n
+from extract.extract_news import get_news, get_media_in_db, today, time_delta, n
 from generate_networks import generate_kg
 from utils.utils import entity_types_list
 from utils.get_size import getsize
@@ -117,13 +117,59 @@ app.layout = dbc.Container(
         ),
         dbc.Row(
             [
+                # dbc.Col(
+                #     [
+                #        dcc.Dropdown(
+                #             id='dropdown-3',
+                #             clearable=False,
+                #             multi=True,
+                #             searchable=False,
+                #             placeholder='Keywords de noticia seleccionada',
+                #             maxHeight=800,
+                #             className='bg-opacity-0 z-3 position-absolute',
+                #             style={
+                #                 'backgroundColor': 'transparent',
+                #                 'width': '250px'
+                #             #     'opacity': 0,
+                #                 # 'position': 'absolute',
+                #                 # 'left': 0,
+                #                 # 'width': '100%',
+                #             }
+                #         )
+                #     ],
+                #     width={'size': 2, 'offset': 0},
+                #     class_name='bg-opacity-0',
+                #     align="start"
+                # ),
                 dbc.Col(
                     [
+                        dcc.Dropdown(
+                            id='dropdown-3',
+                            clearable=False,
+                            multi=True,
+                            searchable=False,
+                            placeholder='Keywords de noticia seleccionada',
+                            maxHeight=800,
+                            className='bg-opacity-0 z-3 position-absolute',
+                            style={
+                                'backgroundColor': 'transparent',
+                                'width': '250px'
+                            #     'opacity': 0,
+                                # 'position': 'absolute',
+                                # 'left': 0,
+                                # 'width': '100%',
+                            }
+                        ),
                         dbc.Spinner(
-                            children=[html.Div(
+                            children=[
+                                html.Div(
+                                    children=[
+                                        network_1
+                                    ],
                                     id='network-1',
-                                    children=[network_1]
-                                )],
+                                    className='mt-0'
+                                )
+                            ],
                             id='spiner-1',
                             color='primary',
                             delay_show=7_000,
@@ -131,10 +177,14 @@ app.layout = dbc.Container(
                         ),
                         modal_no_news
                     ],
-                    width={'size': 12}
+                    width={'size': 12, 'offset': 0},
+                    align="start"
                 )
             ],
-            class_name='mt-1 mb-3'
+            class_name='mt-1 mb-3',
+            # style={
+            #     'position': 'relative'
+            # }
         ),
         dbc.Row(
             [
@@ -238,7 +288,7 @@ def show_news_node_info(selected_node_dict):
         if selected_node:
             selected_node = selected_node[0]
             if selected_node['title'] not in entity_types_list:
-                return f"{selected_node['title']}"
+                return html.A(children=[f"{selected_node['title']}"], href=f"{selected_node['title']}", target='_blank')
             else:
                 return ''
         else:
@@ -277,6 +327,36 @@ def get_keywords(selected_node_dict, data):
         return [{'label': '', 'value': ''}], ['']
     
     
+@callback(
+    Output('dropdown-3', 'options'),
+    Output('dropdown-3', 'value'),
+    Input('kg_news-1', 'selectNode'),
+    State('store-1', 'data'),
+    prevent_initial_call=True
+)
+def get_keywords(selected_node_dict, data):
+    if not data:
+        data = news_with_entities # return [{'label': '', 'value': ''}], ['']
+    n = 5
+    node_selected_id = selected_node_dict['nodes'][0]
+    selected_news = [news_dict for news_dict in data if news_dict['id'] == node_selected_id]
+    if selected_news:
+        selected_news = selected_news[0]
+    else:
+        return [{'label': '', 'value': '', }], ['']
+    if selected_news['body_text']:
+        doc_ = nlp(selected_news['body_text'])
+        options = []
+        value = []
+        for kw in doc_._.phrases[:n]:
+            if kw.text not in [token for token in doc_ if not token.is_stop]:
+                options.append({'label': html.Span([f'{kw.text}'], style={'color': 'white', 'font-size': 16}), 'value': kw.text})
+                value.append(kw.text)
+        return options, value
+    else:
+        return [{'label': '', 'value': ''}], ['']
+
+
 @callback(
     Output('kg_news-1', 'data'),
     Output('store-1', 'data'),
