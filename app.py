@@ -145,11 +145,11 @@ app.layout = dbc.Container(
                 dbc.Col(
                     [
                         dcc.Dropdown(
-                            id='dropdown-3',
+                            id='dropdown-2',
                             clearable=False,
                             multi=True,
                             searchable=False,
-                            placeholder='Keywords de noticia seleccionada',
+                            placeholder='Keywords noticia seleccionada',
                             maxHeight=800,
                             className='bg-opacity-0 z-3 position-absolute',
                             style={
@@ -194,7 +194,7 @@ app.layout = dbc.Container(
                         dcc.Dropdown(
                             id='dropdown-1',
                             options=[{'label': 'Todos', 'value': 'Todos'}] + [
-                                {'label': html.Span([html.I(className='bi bi-book'), f'{str(m)}'], style={'color': 'white', 'font-size': 16}), 
+                                {'label': html.Span([html.I(className='bi bi-book'), f'{' ' + str(m)}'], style={'color': 'white', 'font-size': 16, 'backgroundColor': 'transparent'}), 
                                  'value': str(m)} for m in media_names
                             ],
                             # value='Todos',
@@ -206,17 +206,11 @@ app.layout = dbc.Container(
                         ),
                         dcc.Store(id='store-1', storage_type='session')
                     ],
-                    width={'size': 4, 'offset': 0}
+                    width={'size': 5, 'offset': 0}
                 ),
                 dbc.Col(
                     [
-                        dcc.Dropdown(
-                            id='dropdown-2',
-                            clearable=False,
-                            multi=True,
-                            searchable=False,
-                            placeholder='Keywords de noticia seleccionada'
-                        )
+                        
                     ]
                 )
             ]
