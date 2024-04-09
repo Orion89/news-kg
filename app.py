@@ -92,7 +92,7 @@ app.layout = dbc.Container(
                 ]
             )
         ],
-        class_name='mt-2 mb-3'
+        class_name='mt-1 mb-3 pt-3'
     ),
         dbc.Row(
             [
@@ -393,6 +393,9 @@ def update_kg_1(selected_media):
             )
         except Exception as e:
             print(f'An error has ocurred in getting news from {selected_media}:\n{e}')
+            return no_update, no_update, True
+        if len(news_with_entities_filtered) == 0:
+            print(f'\t{selected_media} sin artículos disponibles')
             return no_update, no_update, True
         
         data, _ = generate_kg(

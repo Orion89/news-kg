@@ -31,7 +31,7 @@ modal_no_news = dbc.Modal(
             ),
         dbc.ModalBody(
             [
-                html.P("No encontramos noticias del medio seleccionado en nuestra base de datos.", className='text-dark'),
+                html.P("¡No encontramos noticias del medio seleccionado!", className='text-dark fw-bold '),
                 html.P("Por favor, selecciona otro medio.", className='text-dark'),
                 html.P('Puedes cerrar este cuadro.', className='text-dark')
             ],
