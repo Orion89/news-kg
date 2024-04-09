@@ -36,7 +36,8 @@ app = Dash(
     external_stylesheets=[
         dbc.themes.YETI,
         dbc.icons.BOOTSTRAP,
-        stylesheets.VIS_NETWORK_STYLESHEET
+        stylesheets.VIS_NETWORK_STYLESHEET,
+        dbc.icons.BOOTSTRAP
     ],
     meta_tags=[
         {'name': 'viewport',
@@ -57,20 +58,20 @@ data_for_kg, _ = generate_kg(
     color_converter=rgb2hex
 )
 network_1 = DashNetwork(
-            id='kg_news-1',
-            style={
-                'height': '800px',
-                'width': '100%',
-                'background': "#222222"
-            },
-            data={
-                'nodes': data_for_kg['nodes'],
-                'edges': data_for_kg['edges']
-            },
-            options=default_options_,
-            enableHciEvents=True,
-        enablePhysicsEvents=False,
-        enableOtherEvents=False
+    id='kg_news-1',
+    style={
+        'height': '800px',
+        'width': '100%',
+        'background': "#222222"
+    },
+    data={
+        'nodes': data_for_kg['nodes'],
+        'edges': data_for_kg['edges']
+    },
+    options=default_options_,
+    enableHciEvents=True,
+    enablePhysicsEvents=False,
+    enableOtherEvents=False
 )
 # media in bd
 media_names = get_media_in_db(conn, year=today.year, month=today.month, day=(today - time_delta).day)
@@ -82,7 +83,7 @@ app.layout = dbc.Container(
         [
             dbc.Col(
                 [
-                    html.H1('Desentraña la red de noticias', className='text-start text-primary fw-bolder')
+                    html.H1('Desentraña la red de noticias', className='text-start text-primary fw-bolder', id='title-1')
                 ],
                 width={'size': 8, 'offset': 0}
             ),
@@ -193,10 +194,15 @@ app.layout = dbc.Container(
                         dcc.Dropdown(
                             id='dropdown-1',
                             options=[{'label': 'Todos', 'value': 'Todos'}] + [
-                                {'label': str(m), 'value': str(m)} for m in media_names
+                                {'label': html.Span([html.I(className='bi bi-book'), f'{str(m)}'], style={'color': 'white', 'font-size': 16}), 
+                                 'value': str(m)} for m in media_names
                             ],
                             # value='Todos',
-                            placeholder="Selecciona un medio"
+                            placeholder="Selecciona un medio",
+                            className='bg-opacity-0',
+                            style={
+                                'backgroundColor': 'transparent'
+                            }
                         ),
                         dcc.Store(id='store-1', storage_type='session')
                     ],
@@ -350,7 +356,7 @@ def get_keywords(selected_node_dict, data):
         value = []
         for kw in doc_._.phrases[:n]:
             if kw.text not in [token for token in doc_ if not token.is_stop]:
-                options.append({'label': html.Span([f'{kw.text}'], style={'color': 'white', 'font-size': 16}), 'value': kw.text})
+                options.append({'label': html.Span([html.I(className='bi bi-bookmark-dash'), f'{kw.text}'], style={'color': 'white', 'font-size': 16}), 'value': kw.text})
                 value.append(kw.text)
         return options, value
     else:
