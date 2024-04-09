@@ -1,3 +1,4 @@
+__pycache__
 bd.ipynb
 Pipfile
 Pipfile.lock
@@ -6,3 +7,9 @@ visualizaciones
 bd.ipynb
 .ipynb_checkpoints
 todo.md
+config/__pycache__
+extract/__pycache__
+sections/__pycache__
+utils/__pycache__
+medias/__pycache__
+network_options/__pycache__

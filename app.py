@@ -3,6 +3,8 @@ from datetime import timedelta
 import os
 from pytz import timezone
 import warnings
+from dotenv import load_dotenv
+load_dotenv()
 
 from dash import Dash, html, dcc, Input, Output, State, callback, no_update
 import dash
@@ -124,7 +126,7 @@ app.layout = dbc.Container(
                                 )],
                             id='spiner-1',
                             color='primary',
-                            delay_show=5_000,
+                            delay_show=7_000,
                             size='md'
                         ),
                         modal_no_news
@@ -344,4 +346,4 @@ def control_modal_2(click_button):
     
     
 if __name__ == "__main__":
-    app.run(debug=False, host=os.getenv("HOST", default='0.0.0.0'), port=os.getenv("PORT", default='8050'))
+    app.run(debug=True, host=os.getenv("HOST", default='localhost'), port=os.getenv("PORT", default='8050')) # host=os.getenv("HOST", default='0.0.0.0'),
