@@ -435,4 +435,4 @@ def control_modal_2(click_button):
     
     
 if __name__ == "__main__":
-    app.run(debug=True, host=os.getenv("HOST", default='localhost'), port=os.getenv("PORT", default='8050')) # host=os.getenv("HOST", default='0.0.0.0'),
+    app.run(debug=False, host=os.getenv("HOST", default='0.0.0.0'), port=os.getenv("PORT", default='8050')) # host=os.getenv("HOST", default='0.0.0.0'),
