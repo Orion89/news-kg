@@ -194,7 +194,7 @@ app.layout = dbc.Container(
                         dcc.Dropdown(
                             id='dropdown-1',
                             options=[{'label': 'Todos', 'value': 'Todos'}] + [
-                                {'label': html.Span([html.I(className='bi bi-book'), f'{' ' + str(m)}'], style={'color': 'white', 'font-size': 16, 'backgroundColor': 'transparent'}), 
+                                {'label': html.Span([html.I(className='bi bi-book'), ' ' + f'{str(m)}'], style={'color': 'white', 'font-size': 16, 'backgroundColor': 'transparent'}), 
                                  'value': str(m)} for m in media_names
                             ],
                             # value='Todos',
