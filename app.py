@@ -32,7 +32,7 @@ warnings.filterwarnings("ignore")
 # app initializing and options
 app = Dash(
     __name__,
-    title='news graph',
+    title='news Knowledge Graph',
     external_stylesheets=[
         dbc.themes.YETI,
         dbc.icons.BOOTSTRAP,
