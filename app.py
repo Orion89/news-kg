@@ -311,18 +311,21 @@ def show_news_node_info(selected_node_dict):
 @callback(
     Output('text-date-1', 'children'),
     Input('kg_news-1', 'selectNode'),
+    State('store-1', 'data'),
     prevent_initial_call=True
 )
-def show_news_node_info(selected_node_dict):
-    if selected_node_dict:
+def show_news_node_info(selected_node_dict, data):
+    if selected_node_dict and data:
         node_selected_id = selected_node_dict['nodes'][0]
-        selected_node = [node_dict for node_dict in data_for_kg['nodes'] if node_dict['id'] == node_selected_id]
-        if selected_node:
-            selected_node = selected_node[0]
-            if selected_node['title'] not in entity_types_list:
-                return f'Noticia del {selected_node["date"].strftime("%d-%m-%Y")}'
-            else:
+        selected_node_dict = [node_dict for node_dict in data if node_dict['id'] == node_selected_id]
+        if selected_node_dict:
+            try:
+                selected_node_dict = selected_node_dict[0]
+                date_text = f'Noticia del {selected_node_dict["date"].strftime("%d-%m-%Y")}'
+            except Exception as e:
                 return ''
+            else:
+                return date_text
         else:
             return ''
     else:
