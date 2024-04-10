@@ -1,9 +1,9 @@
 .VirtualizedSelectFocusedOption {
-    background-color: transparent;
+    background-color: #222222;
     color: white;
 }
 
 .VirtualizedSelectOption {
-    background-color: transparent;
+    background-color: #222222;
     color: white;
 }

@@ -102,7 +102,14 @@ app.layout = dbc.Container(
                         html.P("Haz zoom y/o selecciona un nodo para ver más información.", className='text-light'),
                         modal
                     ],
-                    width={'size': 3, 'offset': 0}
+                    width={'size': 2, 'offset': 0}
+                ),
+                dbc.Col(
+                    [
+                        html.P(id='text-date-1', className='text-light text-center fs-5')
+                    ],
+                    width={'size': 2},
+                    align='end'
                 ),
                 dbc.Col(
                     [
@@ -111,7 +118,7 @@ app.layout = dbc.Container(
                             className='fs-6 text-white text-end'
                         )
                     ],
-                    width={'size': 9},
+                    width={'size': 8},
                     align='end'
                 )
             ]
@@ -201,7 +208,7 @@ app.layout = dbc.Container(
                             placeholder="Selecciona un medio",
                             className='bg-opacity-0',
                             style={
-                                'backgroundColor': 'transparent'
+                                'backgroundColor': '#222222'
                             }
                         ),
                         dcc.Store(id='store-1', storage_type='session')
@@ -210,7 +217,8 @@ app.layout = dbc.Container(
                 ),
                 dbc.Col(
                     [
-                        
+                        html.P(children=["Nodos representan entidades (extraídas con Spacy) mencionadas en noticias. Se forma una arista entre una entidad y un nodo noticia si esa última hace mención de la primera."],
+                               className='text-light text-end')
                     ]
                 )
             ],
@@ -292,6 +300,27 @@ def show_news_node_info(selected_node_dict):
             selected_node = selected_node[0]
             if selected_node['title'] not in entity_types_list:
                 return html.A(children=[f"{selected_node['title']}"], href=f"{selected_node['title']}", target='_blank')
+            else:
+                return ''
+        else:
+            return ''
+    else:
+        return '' # no_update
+
+
+@callback(
+    Output('text-date-1', 'children'),
+    Input('kg_news-1', 'selectNode'),
+    prevent_initial_call=True
+)
+def show_news_node_info(selected_node_dict):
+    if selected_node_dict:
+        node_selected_id = selected_node_dict['nodes'][0]
+        selected_node = [node_dict for node_dict in data_for_kg['nodes'] if node_dict['id'] == node_selected_id]
+        if selected_node:
+            selected_node = selected_node[0]
+            if selected_node['title'] not in entity_types_list:
+                return f'Noticia del {selected_node['date'].strftime('%d-%m-%Y')}'
             else:
                 return ''
         else:
