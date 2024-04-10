@@ -320,7 +320,7 @@ def show_news_node_info(selected_node_dict):
         if selected_node:
             selected_node = selected_node[0]
             if selected_node['title'] not in entity_types_list:
-                return f'Noticia del {selected_node['date'].strftime('%d-%m-%Y')}'
+                return f'Noticia del {selected_node["date"].strftime("%d-%m-%Y")}'
             else:
                 return ''
         else:
