@@ -93,7 +93,7 @@ app.layout = dbc.Container(
                 ]
             )
         ],
-        class_name='mt-1 mb-3 pt-3'
+        class_name='mt-0 mb-3 pt-3'
     ),
         dbc.Row(
             [
@@ -183,9 +183,9 @@ app.layout = dbc.Container(
                 )
             ],
             class_name='mt-1 mb-3',
-            # style={
-            #     'position': 'relative'
-            # }
+            style={
+                'background': '#222222'
+            }
         ),
         dbc.Row(
             [
@@ -213,7 +213,10 @@ app.layout = dbc.Container(
                         
                     ]
                 )
-            ]
+            ],
+            style={
+                'background': '#222222'
+            }
         ),
         dbc.Row( # FOOTER
             [
