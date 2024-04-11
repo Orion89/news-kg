@@ -285,23 +285,45 @@ app.layout = dbc.Container(
 )
 
 
+# @callback(
+#     Output('text-url-1', 'children'),
+#     Input('kg_news-1', 'selectNode'),
+#     prevent_initial_call=True
+# )
+# def show_news_node_info(selected_node_dict):
+#     if selected_node_dict:
+#         # print(selected_node_dict)
+#         node_selected_id = selected_node_dict['nodes'][0]
+#         # print(node_selected_id)
+#         selected_node = [node_dict for node_dict in data_for_kg['nodes'] if node_dict['id'] == node_selected_id]
+#         if selected_node:
+#             selected_node = selected_node[0]
+#             if selected_node['title'] not in entity_types_list:
+#                 return html.A(children=[f"{selected_node['title']}"], href=f"{selected_node['title']}", target='_blank')
+#             else:
+#                 return ''
+#         else:
+#             return ''
+#     else:
+#         return '' # no_update
+    
+
 @callback(
     Output('text-url-1', 'children'),
     Input('kg_news-1', 'selectNode'),
+    State('store-1', 'data'),
     prevent_initial_call=True
 )
 def show_news_node_info(selected_node_dict):
+    data = data if data else news_with_entities
     if selected_node_dict:
         # print(selected_node_dict)
         node_selected_id = selected_node_dict['nodes'][0]
         # print(node_selected_id)
-        selected_node = [node_dict for node_dict in data_for_kg['nodes'] if node_dict['id'] == node_selected_id]
+        selected_node = [node_dict for node_dict in data if node_dict['id'] == node_selected_id]
         if selected_node:
             selected_node = selected_node[0]
-            if selected_node['title'] not in entity_types_list:
-                return html.A(children=[f"{selected_node['title']}"], href=f"{selected_node['title']}", target='_blank')
-            else:
-                return ''
+            return html.A(children=[f"{selected_node['url']}"], href=f"{selected_node['url']}", target='_blank')
         else:
             return ''
     else:
@@ -314,7 +336,8 @@ def show_news_node_info(selected_node_dict):
     State('store-1', 'data'),
     prevent_initial_call=True
 )
-def show_news_node_info(selected_node_dict, data):
+def show_news_date(selected_node_dict, data):
+    data = data if data else news_with_entities
     if selected_node_dict and data:
         node_selected_id = selected_node_dict['nodes'][0]
         selected_node_dict = [node_dict for node_dict in data if node_dict['id'] == node_selected_id]
