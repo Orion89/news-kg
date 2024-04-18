@@ -29,7 +29,7 @@ from sections.modals import modal, modal_no_news
 
 warnings.filterwarnings("ignore")
 
-news_loaded = os.getenv["NEWS_LOADED"]
+news_loaded = os.getenv("NEWS_LOADED")
 print(f"News loaded?: {news_loaded}")
 
 # app initializing and options
