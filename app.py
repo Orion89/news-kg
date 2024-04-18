@@ -29,6 +29,9 @@ from sections.modals import modal, modal_no_news
 
 warnings.filterwarnings("ignore")
 
+news_loaded = os.getenv["NEWS_LOADED"]
+print(f"News loaded?: {news_loaded}")
+
 # app initializing and options
 app = Dash(
     __name__,
@@ -106,7 +109,7 @@ app.layout = dbc.Container(
                 ),
                 dbc.Col(
                     [
-                        html.P(id='text-date-1', className='text-light text-center fs-5')
+                        html.P(id='text-date-1', className='text-info text-center fs-5')
                     ],
                     width={'size': 2},
                     align='end'
@@ -314,7 +317,7 @@ app.layout = dbc.Container(
     State('store-1', 'data'),
     prevent_initial_call=True
 )
-def show_news_node_info(selected_node_dict):
+def show_news_node_info(selected_node_dict, data):
     data = data if data else news_with_entities
     if selected_node_dict:
         # print(selected_node_dict)
