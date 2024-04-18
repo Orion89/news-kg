@@ -53,6 +53,7 @@ app.css.config.serve_locally = True
 server = app.server
 nlp.add_pipe("textrank")
 # Initialize KG
+EXTRACTION_METHOD = 'spacy'
 colors = get_cmap('tab20').colors
 data_for_kg, _ = generate_kg(
     news_list=news_with_entities,
