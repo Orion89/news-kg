@@ -1,4 +1,4 @@
-def generate_kg(news_list:list=None, entity_types:list=None, colors:list=None, color_converter=None) -> dict:
+def generate_kg_spacy(news_list:list=None, entity_types:list=None, colors:list=None, color_converter=None) -> tuple:
     from itertools import count
     all_entities = []
     for entity_list in [ent for ent in [l['entities'] for l in news_list]]:
@@ -101,3 +101,7 @@ def generate_kg(news_list:list=None, entity_types:list=None, colors:list=None, c
     }
     
     return data, list(media_names)
+
+
+def generate_kg_llm(news_entities_llm=None, news_entities_spacy=None, news_ids_without_llm_entities:list=None):
+    pass

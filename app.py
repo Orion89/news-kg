@@ -19,7 +19,7 @@ import pytextrank
 from config.db import conn
 from extract.extract_entities import news_with_entities, nlp, extract_entities_spacy
 from extract.extract_news import get_news, get_media_in_db, today, time_delta, n
-from generate_networks import generate_kg
+from generate_networks import generate_kg_spacy
 from utils.utils import entity_types_list
 from utils.get_size import getsize
 from network_options.options import default_options_
@@ -55,7 +55,7 @@ nlp.add_pipe("textrank")
 # Initialize KG
 EXTRACTION_METHOD = 'spacy'
 colors = get_cmap('tab20').colors
-data_for_kg, _ = generate_kg(
+data_for_kg, _ = generate_kg_spacy(
     news_list=news_with_entities,
     entity_types=entity_types_list,
     colors=colors,

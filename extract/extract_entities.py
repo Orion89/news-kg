@@ -27,18 +27,6 @@ def extract_entities_spacy(extracted_raw_news=None, nlp=None) -> list:
     return news_with_entities
 
 
-extracted_raw_news = get_news(
-    connection=conn, # conn_postgresql
-    table_name='news_chile',
-    year=today.year,
-    month=today.month,
-    day=(today - time_delta).day,
-    n=n
-)
-
-news_with_entities = extract_entities_spacy(extracted_raw_news=extracted_raw_news, nlp=nlp)
-
-
 def extract_entities_llm(client=None, db_name:str='news', collection_name:str='news_entities', delta_days:int=1) -> list:
     from datetime import datetime, timedelta
     mongo_db = client[db_name]
@@ -52,3 +40,15 @@ def extract_entities_llm(client=None, db_name:str='news', collection_name:str='n
     news_ids_without_llm_entities = [obj["_id"] for obj in news_objs if obj["_id"] not in [n["_id"] for n in news_objs_with_llm_entities]]
     
     return news_objs_with_llm_entities, news_ids_without_llm_entities
+
+
+extracted_raw_news = get_news(
+    connection=conn, # conn_postgresql
+    table_name='news_chile',
+    year=today.year,
+    month=today.month,
+    day=(today - time_delta).day,
+    n=n
+)
+
+news_with_entities = extract_entities_spacy(extracted_raw_news=extracted_raw_news, nlp=nlp)
