@@ -19,7 +19,7 @@ import pytextrank
 from config.db import conn
 from extract.extract_entities import news_with_entities_spacy, nlp, extract_entities_spacy, news_with_entities_llm, news_ids_without_llm_entities
 from extract.extract_news import get_news, get_media_in_db, today, time_delta, n
-from generate_networks import generate_kg_spacy
+from generate_networks import generate_kg_spacy, generate_kg_llm, generate_kg_llm_and_spacy
 from utils.utils import entity_types_list
 from utils.get_size import getsize
 from network_options.options import default_options_
@@ -31,6 +31,8 @@ warnings.filterwarnings("ignore")
 
 news_loaded = os.getenv("NEWS_LOADED")
 print(f"News loaded?: {news_loaded}")
+# extraction types: LLM, SPACY, LLM+SPACY
+ENTITY_EXTRACTION_TYPE = "LLM"
 
 # app initializing and options
 app = Dash(
@@ -53,14 +55,20 @@ app.css.config.serve_locally = True
 server = app.server
 nlp.add_pipe("textrank")
 # Initialize KG
-EXTRACTION_METHOD = 'spacy'
+# EXTRACTION_METHOD = 'spacy'
 colors = get_cmap('tab20').colors
-data_for_kg, _ = generate_kg_spacy(
-    news_list=news_with_entities_spacy,
-    entity_types=entity_types_list,
-    colors=colors,
-    color_converter=rgb2hex
-)
+if ENTITY_EXTRACTION_TYPE == "SPACY":
+    data_for_kg, _ = generate_kg_spacy(
+        news_list=news_with_entities_spacy,
+        entity_types=entity_types_list,
+        colors=colors,
+        color_converter=rgb2hex
+    )
+elif ENTITY_EXTRACTION_TYPE == "LLM":
+    data_for_kg = generate_kg_llm(
+        news_data_llm=news_with_entities_llm
+    )
+    
 network_1 = DashNetwork(
     id='kg_news-1',
     style={

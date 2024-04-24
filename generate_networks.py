@@ -249,7 +249,7 @@ def generate_kg_llm_and_spacy(news_entities_llm=None, news_entities_spacy=None, 
     return {'nodes': nodes, 'edges': edges}
 
 
-def generate_kg_llm(news_data_spacy, news_data_llm):
+def generate_kg_llm(news_data_llm):
     # selected_data = data[name_data]
     # selected_data = data.copy()
     nodes = []
