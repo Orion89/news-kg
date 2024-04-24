@@ -460,7 +460,7 @@ def update_kg_1(selected_media):
             print(f'\t{selected_media} sin artículos disponibles')
             return no_update, no_update, True
         
-        data, _ = generate_kg(
+        data, _ = generate_kg_spacy(
             news_list=news_with_entities_filtered,
             entity_types=entity_types_list,
             colors=colors,
