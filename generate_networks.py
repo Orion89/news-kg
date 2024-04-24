@@ -3,7 +3,6 @@ from typing import Dict, List
 from urllib.parse import urlparse
 
 def generate_kg_spacy(news_list:list=None, entity_types:list=None, colors:list=None, color_converter=None) -> tuple:
-    # from itertools import count
     all_entities = []
     for entity_list in [ent for ent in [l['entities'] for l in news_list]]:
         for ent in entity_list:
@@ -107,14 +106,13 @@ def generate_kg_spacy(news_list:list=None, entity_types:list=None, colors:list=N
     return data, list(media_names)
 
 
-def generate_kg_llm_and_spacy(news_entities_llm=None, news_entities_spacy=None, news_ids_without_llm_entities:list=None):
-    # selected_data = data[name_data]
-    # selected_data = data.copy()
+def generate_kg_llm_and_spacy(news_entities_llm=None, news_entities_spacy=None, news_ids_without_llm_entities:list=None) -> Dict[str, List]:
+    news_data = news_entities_llm + news_entities_spacy # solo placeholder, desarrollar
     nodes = []
     edges = []
     
-    news_media = set([urlparse(news_dict['url']).netloc for news_dict in selected_data])
-    news_ids = set([news_dict['_id'] for news_dict in selected_data])
+    news_media = set([urlparse(news_dict['url']).netloc for news_dict in news_data])
+    news_ids = set([news_dict['_id'] for news_dict in news_data])
     media_ids = {media: i for i, media in enumerate(list(news_media))}
     for media_name in list(news_media):
         media_node = {
@@ -132,7 +130,7 @@ def generate_kg_llm_and_spacy(news_entities_llm=None, news_entities_spacy=None, 
         
     node_id_generator = count(max(news_ids) + 1)
     edge_id_generator = count(1)
-    for data_dict in selected_data:
+    for data_dict in news_data:
         news_node = {
             'id': data_dict['_id'],
             'title': data_dict['url'],
@@ -251,8 +249,6 @@ def generate_kg_llm_and_spacy(news_entities_llm=None, news_entities_spacy=None, 
 
 
 def generate_kg_llm(news_data_llm) -> Dict[str, List]:
-    # selected_data = data[name_data]
-    # selected_data = data.copy()
     nodes = []
     edges = []
     
