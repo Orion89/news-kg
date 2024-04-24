@@ -37,3 +37,18 @@ extracted_raw_news = get_news(
 )
 
 news_with_entities = extract_entities_spacy(extracted_raw_news=extracted_raw_news, nlp=nlp)
+
+
+def extract_entities_llm(client=None, db_name:str='news', collection_name:str='news_entities', delta_days:int=1) -> list:
+    from datetime import datetime, timedelta
+    mongo_db = client[db_name]
+    mongo_collection = mongo_db[collection_name]
+    
+    today = datetime.today()
+    t_delta = timedelta(days=delta_days, hours=today.hour, minutes=today.minute, seconds=today.second)
+    filter_datetime = today - t_delta
+    news_objs = list(filter(lambda obj: datetime.strptime(obj["date"], "%Y-%m-%d %H:%M:%S") >= filter_datetime, (obj for obj in mongo_collection.find() if "date" in obj.keys()))) 
+    news_objs_with_llm_entities = list(filter(lambda obj: len(obj["triplets"]), news_objs))
+    news_ids_without_llm_entities = [obj["_id"] for obj in news_objs if obj["_id"] not in [n["_id"] for n in news_objs_with_llm_entities]]
+    
+    return news_objs_with_llm_entities, news_ids_without_llm_entities
