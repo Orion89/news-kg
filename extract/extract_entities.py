@@ -4,9 +4,19 @@ from pytz import timezone
 
 from extract.extract_news import get_news, tz, today, time_delta, n
 from config.db import conn
+from config.mongo import settings_for_mongo
+
 import spacy
+from pymongo import MongoClient
 
 nlp = spacy.load('es_core_news_md')
+
+mongo_client = MongoClient(
+    host=settings_for_mongo.MONGOHOST,
+    port=settings_for_mongo.MONGOPORT,
+    username=settings_for_mongo.MONGOUSER,
+    password=settings_for_mongo.MONGOPASSWORD
+)
 
 
 def extract_entities_spacy(extracted_raw_news=None, nlp=None) -> list:
@@ -27,7 +37,7 @@ def extract_entities_spacy(extracted_raw_news=None, nlp=None) -> list:
     return news_with_entities
 
 
-def extract_entities_llm(client=None, db_name:str='news', collection_name:str='news_entities', delta_days:int=1) -> list:
+def extract_entities_llm(client=None, db_name:str='news', collection_name:str='news_entities', delta_days:int=1) -> tuple:
     from datetime import datetime, timedelta
     mongo_db = client[db_name]
     mongo_collection = mongo_db[collection_name]
@@ -51,4 +61,5 @@ extracted_raw_news = get_news(
     n=n
 )
 
-news_with_entities = extract_entities_spacy(extracted_raw_news=extracted_raw_news, nlp=nlp)
+news_with_entities_spacy = extract_entities_spacy(extracted_raw_news=extracted_raw_news, nlp=nlp)
+news_with_entities_llm, news_ids_without_llm_entities = extract_entities_llm(client=mongo_client, delta_days=1)

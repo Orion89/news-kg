@@ -17,7 +17,7 @@ from matplotlib.cm import get_cmap
 import pytextrank
 
 from config.db import conn
-from extract.extract_entities import news_with_entities, nlp, extract_entities_spacy
+from extract.extract_entities import news_with_entities_spacy, nlp, extract_entities_spacy, news_with_entities_llm, news_ids_without_llm_entities
 from extract.extract_news import get_news, get_media_in_db, today, time_delta, n
 from generate_networks import generate_kg_spacy
 from utils.utils import entity_types_list
@@ -56,7 +56,7 @@ nlp.add_pipe("textrank")
 EXTRACTION_METHOD = 'spacy'
 colors = get_cmap('tab20').colors
 data_for_kg, _ = generate_kg_spacy(
-    news_list=news_with_entities,
+    news_list=news_with_entities_spacy,
     entity_types=entity_types_list,
     colors=colors,
     color_converter=rgb2hex
@@ -319,7 +319,7 @@ app.layout = dbc.Container(
     prevent_initial_call=True
 )
 def show_news_node_info(selected_node_dict, data):
-    data = data if data else news_with_entities
+    data = data if data else news_with_entities_spacy
     if selected_node_dict:
         # print(selected_node_dict)
         node_selected_id = selected_node_dict['nodes'][0]
@@ -341,7 +341,7 @@ def show_news_node_info(selected_node_dict, data):
     prevent_initial_call=True
 )
 def show_news_date(selected_node_dict, data):
-    data = data if data else news_with_entities
+    data = data if data else news_with_entities_spacy
     if selected_node_dict and data:
         node_selected_id = selected_node_dict['nodes'][0]
         selected_node_dict = [node_dict for node_dict in data if node_dict['id'] == node_selected_id]
@@ -368,7 +368,7 @@ def show_news_date(selected_node_dict, data):
 )
 def get_keywords(selected_node_dict, data):
     if not data:
-        data = news_with_entities # return [{'label': '', 'value': ''}], ['']
+        data = news_with_entities_spacy # return [{'label': '', 'value': ''}], ['']
     n = 5
     node_selected_id = selected_node_dict['nodes'][0]
     selected_news = [news_dict for news_dict in data if news_dict['id'] == node_selected_id]
@@ -398,7 +398,7 @@ def get_keywords(selected_node_dict, data):
 )
 def get_keywords(selected_node_dict, data):
     if not data:
-        data = news_with_entities # return [{'label': '', 'value': ''}], ['']
+        data = news_with_entities_spacy # return [{'label': '', 'value': ''}], ['']
     n = 5
     node_selected_id = selected_node_dict['nodes'][0]
     selected_news = [news_dict for news_dict in data if news_dict['id'] == node_selected_id]
@@ -428,7 +428,7 @@ def get_keywords(selected_node_dict, data):
 )
 def update_kg_1(selected_media):
     if selected_media == 'Todos':
-        return {'nodes': data_for_kg['nodes'], 'edges': data_for_kg['edges']}, news_with_entities, False
+        return {'nodes': data_for_kg['nodes'], 'edges': data_for_kg['edges']}, news_with_entities_spacy, False
     else:
         print(f'Se ha seleccionado un medio: {selected_media}')
         # news_with_entities_filtered = [

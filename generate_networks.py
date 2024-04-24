@@ -1,5 +1,8 @@
+from itertools import count
+from urllib.parse import urlparse
+
 def generate_kg_spacy(news_list:list=None, entity_types:list=None, colors:list=None, color_converter=None) -> tuple:
-    from itertools import count
+    # from itertools import count
     all_entities = []
     for entity_list in [ent for ent in [l['entities'] for l in news_list]]:
         for ent in entity_list:
@@ -103,5 +106,287 @@ def generate_kg_spacy(news_list:list=None, entity_types:list=None, colors:list=N
     return data, list(media_names)
 
 
-def generate_kg_llm(news_entities_llm=None, news_entities_spacy=None, news_ids_without_llm_entities:list=None):
-    pass
+def generate_kg_llm_and_spacy(news_entities_llm=None, news_entities_spacy=None, news_ids_without_llm_entities:list=None):
+    # selected_data = data[name_data]
+    # selected_data = data.copy()
+    nodes = []
+    edges = []
+    
+    news_media = set([urlparse(news_dict['url']).netloc for news_dict in selected_data])
+    news_ids = set([news_dict['_id'] for news_dict in selected_data])
+    media_ids = {media: i for i, media in enumerate(list(news_media))}
+    for media_name in list(news_media):
+        media_node = {
+            'id': media_ids[media_name],
+            'label': media_name,
+            'title': media_name,
+            'group': "MEDIA",
+            'shape': 'dot',
+            'font': {
+                'color': 'white',
+                'size': 17
+            }
+        }
+        nodes.append(media_node)
+        
+    node_id_generator = count(max(news_ids) + 1)
+    edge_id_generator = count(1)
+    for data_dict in selected_data:
+        news_node = {
+            'id': data_dict['_id'],
+            'title': data_dict['url'],
+            'label': f"noticia_{data_dict['_id']}",
+            'group': 'NEWS',
+            # 'color': colors_for_nodes['NEWS'],
+            'shape': 'dot',
+            'font': {
+                'color': 'white',
+                'size': 17
+            }
+        }
+        nodes.append(news_node)
+        edge_id = next(edge_id_generator)
+        news_to_media_edge = {
+            'id': edge_id,
+            'label': 'PUBLICADO_POR',
+            'from': data_dict['_id'],
+            'to': media_ids[urlparse(data_dict['url']).netloc],
+            'arrows': 'to',
+            'font': {
+                        'color': '#D3D3D3',
+                        'size': 10,
+                        'strokeWidth': 0
+                    }
+        }
+        edges.append(news_to_media_edge)
+        for triple in data_dict['entities']:
+            if not triple['head'] in [node['label'] for node in nodes]:
+                head_added = False
+                tail_added = False
+                head_id = next(node_id_generator)
+                head_node = {
+                    'id': head_id,
+                    'label': triple['head'],
+                    'title': triple['type_head'],
+                    'group': "ENTITIES",
+                    'shape': 'dot',
+                    'mass': 7,
+                    'font': {
+                        'color': 'white',
+                        'size': 17
+                    }
+                }
+                nodes.append(head_node)
+                head_added = True
+            if not triple['tail'] in [node['label'] for node in nodes]:
+                tail_id = next(node_id_generator)
+                tail_node = {
+                    'id': tail_id,
+                    'label': triple['tail'],
+                    'title': triple['type_tail'],
+                    'group': "ENTITIES",
+                    'shape': 'dot',
+                    'mass': 7,
+                    'font': {
+                        'color': 'white',
+                        'size': 17
+                    }
+                }
+                nodes.append(tail_node)
+                tail_added = True
+            if head_added or tail_added:
+                if (head_id, tail_id) not in [(edge_dict['from'], edge_dict['to']) for edge_dict in edges]:
+                    edge_id = next(edge_id_generator) # Filtrar edge para evitar edges duplicados
+                    head_to_tail_edge = {
+                        'id': edge_id,
+                        'label': triple['relation'],
+                        'from': head_id,
+                        'to': tail_id,
+                        'arrows': 'to',
+                        'length': 300,
+                        'font': {
+                                'color': '#D3D3D3',
+                                'size': 10,
+                                'strokeWidth': 0
+                            }
+                    }
+                    edges.append(head_to_tail_edge)
+            if head_added:
+                if (head_id, data_dict["_id"]) not in [(edge_dict['from'], edge_dict['to']) for edge_dict in edges]:
+                    edge_id = next(edge_id_generator)
+                    head_to_news_edge = {
+                        'id': edge_id,
+                        'label': "MENCIONADO_EN",
+                        'from': head_id,
+                        'to': data_dict["_id"],
+                        'arrows': 'to',
+                        'hidden': True,
+                        'font': {
+                                'color': '#D3D3D3',
+                                'size': 10,
+                                'strokeWidth': 0
+                            }
+                    }
+                    edges.append(head_to_news_edge)
+            if tail_added:
+                if (tail_id, data_dict["_id"]) not in [(edge_dict['from'], edge_dict['to']) for edge_dict in edges]:
+                    edge_id = next(edge_id_generator)
+                    tail_to_news_edge = {
+                        'id': edge_id,
+                        'label': "MENCIONADO_EN",
+                        'from': tail_id,
+                        'to': data_dict["_id"],
+                        'arrows': 'to',
+                        'hidden': True,
+                        'font': {
+                                'color': '#D3D3D3',
+                                'size': 10,
+                                'strokeWidth': 0
+                            }
+                    }
+                    edges.append(tail_to_news_edge)
+            
+    return {'nodes': nodes, 'edges': edges}
+
+
+def generate_kg_llm(news_data_spacy, news_data_llm):
+    # selected_data = data[name_data]
+    # selected_data = data.copy()
+    nodes = []
+    edges = []
+    
+    news_media = set([urlparse(news_dict['url']).netloc for news_dict in news_data_llm])
+    news_ids = set([news_dict['_id'] for news_dict in news_data_llm])
+    media_ids = {media: i for i, media in enumerate(list(news_media))}
+    for media_name in list(news_media):
+        media_node = {
+            'id': media_ids[media_name],
+            'label': media_name,
+            'title': media_name,
+            'group': "MEDIA",
+            'shape': 'dot',
+            'font': {
+                'color': 'white',
+                'size': 17
+            }
+        }
+        nodes.append(media_node)
+        
+    node_id_generator = count(max(news_ids) + 1)
+    edge_id_generator = count(1)
+    for data_dict in news_data_llm:
+        news_node = {
+            'id': data_dict['_id'],
+            'title': data_dict['url'],
+            'label': f"noticia_{data_dict['_id']}",
+            'group': 'NEWS',
+            # 'color': colors_for_nodes['NEWS'],
+            'shape': 'dot',
+            'font': {
+                'color': 'white',
+                'size': 17
+            }
+        }
+        nodes.append(news_node)
+        edge_id = next(edge_id_generator)
+        news_to_media_edge = {
+            'id': edge_id,
+            'label': 'PUBLICADO_POR',
+            'from': data_dict['_id'],
+            'to': media_ids[urlparse(data_dict['url']).netloc],
+            'arrows': 'to',
+            'font': {
+                        'color': '#D3D3D3',
+                        'size': 10,
+                        'strokeWidth': 0
+                    }
+        }
+        edges.append(news_to_media_edge)
+        for triple in data_dict['entities']:
+            head_added = False
+            tail_added = False
+            if not triple['head'] in [node['label'] for node in nodes]:
+                head_id = next(node_id_generator)
+                head_node = {
+                    'id': head_id,
+                    'label': triple['head'],
+                    'title': triple['type_head'],
+                    'group': "ENTITIES",
+                    'shape': 'dot',
+                    'mass': 7,
+                    'font': {
+                        'color': 'white',
+                        'size': 17
+                    }
+                }
+                nodes.append(head_node)
+                head_added = True
+            if not triple['tail'] in [node['label'] for node in nodes]:
+                tail_id = next(node_id_generator)
+                tail_node = {
+                    'id': tail_id,
+                    'label': triple['tail'],
+                    'title': triple['type_tail'],
+                    'group': "ENTITIES",
+                    'shape': 'dot',
+                    'mass': 7,
+                    'font': {
+                        'color': 'white',
+                        'size': 17
+                    }
+                }
+                nodes.append(tail_node)
+                tail_added = True
+            if head_added or tail_added:
+                if (head_id, tail_id) not in [(edge_dict['from'], edge_dict['to']) for edge_dict in edges]:
+                    edge_id = next(edge_id_generator) # Filtrar edge para evitar edges duplicados
+                    head_to_tail_edge = {
+                        'id': edge_id,
+                        'label': triple['relation'],
+                        'from': head_id,
+                        'to': tail_id,
+                        'arrows': 'to',
+                        'length': 300,
+                        'font': {
+                                'color': '#D3D3D3',
+                                'size': 10,
+                                'strokeWidth': 0
+                            }
+                    }
+                    edges.append(head_to_tail_edge)
+            if head_added:
+                if (head_id, data_dict["_id"]) not in [(edge_dict['from'], edge_dict['to']) for edge_dict in edges]:
+                    edge_id = next(edge_id_generator)
+                    head_to_news_edge = {
+                        'id': edge_id,
+                        'label': "MENCIONADO_EN",
+                        'from': head_id,
+                        'to': data_dict["_id"],
+                        'arrows': 'to',
+                        'hidden': True,
+                        'font': {
+                                'color': '#D3D3D3',
+                                'size': 10,
+                                'strokeWidth': 0
+                            }
+                    }
+                    edges.append(head_to_news_edge)
+            if tail_added:
+                if (tail_id, data_dict["_id"]) not in [(edge_dict['from'], edge_dict['to']) for edge_dict in edges]:
+                    edge_id = next(edge_id_generator)
+                    tail_to_news_edge = {
+                        'id': edge_id,
+                        'label': "MENCIONADO_EN",
+                        'from': tail_id,
+                        'to': data_dict["_id"],
+                        'arrows': 'to',
+                        'hidden': True,
+                        'font': {
+                                'color': '#D3D3D3',
+                                'size': 10,
+                                'strokeWidth': 0
+                            }
+                    }
+                    edges.append(tail_to_news_edge)
+            
+    return {'nodes': nodes, 'edges': edges}
