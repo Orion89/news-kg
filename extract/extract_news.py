@@ -1,5 +1,4 @@
-from datetime import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta
 from pytz import timezone
 import re
 
@@ -99,29 +98,28 @@ def news_extractor_per_media_concurrent(media:str, today:datetime, t_delta:timed
     print(f'Concluida extracción de noticias de {media}')
         
         
-def get_news(connection, table_name:str='news_chile', n:int=10, year:int=None, day:int=None, month:int=None, media_name:str=None):
+def get_news(connection, table_name:str='news_chile', n:int=10, delta_days=1, media_name:str=None):
+    today = datetime.today()
+    t_delta = timedelta(days=delta_days, hours=today.hour, minutes=today.minute, seconds=today.second)
+    from_date = (today - t_delta).strftime('%Y-%m-%d')
     cursor_pgsql = connection.cursor()
     fetched_ids = set()
     fetched_ids.add(-1)
-    if year and month and day and not media_name:
+    if delta_days and not media_name:
         query = f'''
         SELECT id, date, media_name, url, body, keywords
         FROM {table_name}
         WHERE id NOT IN ({re.sub(pattern=r"[{}]", repl="", string=str(fetched_ids))})
-        AND EXTRACT(YEAR FROM date) >= {year}
-        AND EXTRACT(MONTH FROM date) >= {month}
-        AND EXTRACT(DAY FROM date) >= {day}
+        AND date::date >= '{from_date}
         LIMIT {str(n)}
         '''
-    elif year and month and day and media_name:
+    elif delta_days and media_name:
         query = f'''
         SELECT id, date, media_name, url, body, keywords
         FROM {table_name}
         WHERE id NOT IN ({re.sub(pattern=r"[{}]", repl="", string=str(fetched_ids))})
         AND media_name = '{media_name}'
-        AND EXTRACT(YEAR FROM date) >= {year}
-        AND EXTRACT(MONTH FROM date) >= {month}
-        AND EXTRACT(DAY FROM date) >= {day}
+        AND date::date >= '{from_date}
         LIMIT {str(n)}
         '''
     else:

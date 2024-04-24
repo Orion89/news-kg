@@ -1,8 +1,7 @@
-from datetime import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta
 from pytz import timezone
 
-from extract.extract_news import get_news, tz, today, time_delta, n
+from extract.extract_news import get_news, n
 from config.db import conn
 from config.mongo import settings_for_mongo
 
@@ -38,7 +37,6 @@ def extract_entities_spacy(extracted_raw_news=None, nlp=None) -> list:
 
 
 def extract_entities_llm(client=None, db_name:str='news', collection_name:str='news_entities', delta_days:int=1) -> tuple:
-    from datetime import datetime, timedelta
     mongo_db = client[db_name]
     mongo_collection = mongo_db[collection_name]
     
@@ -55,11 +53,16 @@ def extract_entities_llm(client=None, db_name:str='news', collection_name:str='n
 extracted_raw_news = get_news(
     connection=conn, # conn_postgresql
     table_name='news_chile',
-    year=today.year,
-    month=today.month,
-    day=(today - time_delta).day,
+    delta_days=1,
     n=n
 )
 
 news_with_entities_spacy = extract_entities_spacy(extracted_raw_news=extracted_raw_news, nlp=nlp)
 news_with_entities_llm, news_ids_without_llm_entities = extract_entities_llm(client=mongo_client, delta_days=1)
+
+for news_dict in news_with_entities_llm:
+    same_news = [news_data for news_data in news_with_entities_spacy if news_data["id"] == news_dict["_id"]][0]
+    news_dict["body_text"] = same_news["body_text"]
+    news_dict["media"] = same_news["media"]
+    news_dict["id"] = news_dict["_id"] # normalizar id de otra forma
+    news_dict["date"] = datetime.strptime(news_dict["date"], "%Y-%m-%d %H:%M:%S")

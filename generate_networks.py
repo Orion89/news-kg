@@ -1,4 +1,5 @@
 from itertools import count
+from typing import Dict, List
 from urllib.parse import urlparse
 
 def generate_kg_spacy(news_list:list=None, entity_types:list=None, colors:list=None, color_converter=None) -> tuple:
@@ -249,7 +250,7 @@ def generate_kg_llm_and_spacy(news_entities_llm=None, news_entities_spacy=None, 
     return {'nodes': nodes, 'edges': edges}
 
 
-def generate_kg_llm(news_data_llm):
+def generate_kg_llm(news_data_llm) -> Dict[str, List]:
     # selected_data = data[name_data]
     # selected_data = data.copy()
     nodes = []
