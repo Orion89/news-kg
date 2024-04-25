@@ -19,7 +19,7 @@ import pytextrank
 
 from config.db import conn
 from extract.extract_entities import news_with_entities_spacy, nlp, extract_entities_spacy, news_with_entities_llm, news_ids_without_llm_entities
-from extract.extract_news import get_news, get_media_in_db, today, time_delta, n
+from extract.extract_news import get_news, get_media_in_db, today, time_delta
 from generate_networks import generate_kg_spacy, generate_kg_llm, generate_kg_llm_and_spacy
 from utils.utils import entity_types_list
 from utils.get_size import getsize

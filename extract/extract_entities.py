@@ -63,9 +63,9 @@ news_with_entities_llm, news_ids_without_llm_entities = extract_entities_llm(cli
 print(f"Cantidad en llm entities: {len(news_with_entities_llm)}")
 print(f"Cantidad en spacy entities: {len(news_with_entities_spacy)}")
 
-# for news_dict in news_with_entities_llm:
-#     same_news = [news_data for news_data in news_with_entities_spacy if news_data["url"] == news_dict["url"]][0] # news_data["url"]
-#     news_dict["body_text"] = same_news["body_text"]
-#     news_dict["media"] = same_news["media"]
-#     news_dict["id"] = news_dict["_id"] # normalizar id de otra forma
-#     news_dict["date"] = datetime.strptime(news_dict["date"], "%Y-%m-%d %H:%M:%S")
+for news_dict in news_with_entities_llm:
+    same_news = [news_data for news_data in news_with_entities_spacy if news_data["url"] == news_dict["url"]][0] # news_data["url"]
+    news_dict["body_text"] = same_news["body_text"]
+    news_dict["media"] = same_news["media"]
+    news_dict["id"] = news_dict["_id"] # normalizar id de otra forma
+    news_dict["date"] = datetime.strptime(news_dict["date"], "%Y-%m-%d %H:%M:%S")
