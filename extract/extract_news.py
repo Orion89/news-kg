@@ -110,7 +110,7 @@ def get_news(connection, table_name:str='news_chile', n:int=10, delta_days=1, me
         SELECT id, date, media_name, url, body, keywords
         FROM {table_name}
         WHERE id NOT IN ({re.sub(pattern=r"[{}]", repl="", string=str(fetched_ids))})
-        AND date::date >= '{from_date}
+        AND date::date >= "{from_date}"
         LIMIT {str(n)}
         '''
     elif delta_days and media_name:
@@ -118,8 +118,8 @@ def get_news(connection, table_name:str='news_chile', n:int=10, delta_days=1, me
         SELECT id, date, media_name, url, body, keywords
         FROM {table_name}
         WHERE id NOT IN ({re.sub(pattern=r"[{}]", repl="", string=str(fetched_ids))})
-        AND media_name = '{media_name}'
-        AND date::date >= '{from_date}
+        AND media_name = "{media_name}"
+        AND date::date >= "{from_date}"
         LIMIT {str(n)}
         '''
     else:
