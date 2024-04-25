@@ -61,7 +61,7 @@ news_with_entities_spacy = extract_entities_spacy(extracted_raw_news=extracted_r
 news_with_entities_llm, news_ids_without_llm_entities = extract_entities_llm(client=mongo_client, delta_days=1)
 
 for news_dict in news_with_entities_llm:
-    same_news = [news_data for news_data in news_with_entities_spacy if news_data["id"] == news_dict["_id"]][0]
+    same_news = [news_data for news_data in news_with_entities_spacy if news_data["url"] == news_dict["url"]][0] # news_data["url"]
     news_dict["body_text"] = same_news["body_text"]
     news_dict["media"] = same_news["media"]
     news_dict["id"] = news_dict["_id"] # normalizar id de otra forma
