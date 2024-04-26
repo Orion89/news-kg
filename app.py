@@ -183,6 +183,44 @@ app.layout = dbc.Container(
                                 # 'width': '100%',
                             }
                         ),
+                        html.P(
+                            children=[
+                                html.I(className="bi bi-circle-fill", style={'color': '#FB7F81'}),
+                                html.Span(" Entidades", style={'color': '#FB7F81'}),
+                            ],
+                            className='bg-opacity-0 z-3 position-absolute',
+                            style={
+                                'backgroundColor': 'transparent',
+                                'width': '250px',
+                                'right': 5
+                            }
+                        ),
+                        html.P(
+                            children=[
+                                html.I(className="bi bi-circle-fill", style={'color': '#FFFF01'}),
+                                html.Span(" Noticias", style={'color': '#FFFF01'})
+                            ],
+                            className='bg-opacity-0 z-3 position-absolute',
+                            style={
+                                'backgroundColor': 'transparent',
+                                'width': '250px',
+                                'top': 40,
+                                'right': 5
+                            }
+                        ),
+                        html.P(
+                            children=[
+                                html.I(className="bi bi-circle-fill", style={'color': '#98C2FC'}),
+                                html.Span(" Medios", style={'color': '#98C2FC'})
+                            ],
+                            className='bg-opacity-0 z-3 position-absolute',
+                            style={
+                                'backgroundColor': 'transparent',
+                                'width': '250px',
+                                'top': 65,
+                                'right': 5
+                            }
+                        ),
                         dbc.Spinner(
                             children=[
                                 html.Div(
@@ -197,18 +235,6 @@ app.layout = dbc.Container(
                             color='primary',
                             delay_show=8_000,
                             size='md'
-                        ),
-                        html.P(
-                            children=[
-                                [html.I(className="bi bi-circle-fill", style={'color': '#FB7F81'}), " Entidades"],
-                                [html.I(className="bi bi-circle-fill", style={'color': '#FFFF01'}), " Noticias"]
-                            ],
-                            className='bg-opacity-0 z-3 position-absolute',
-                            style={
-                                'backgroundColor': 'transparent',
-                                'width': '250px',
-                                'left': 200
-                            }
                         ),
                         modal_no_news
                     ],
