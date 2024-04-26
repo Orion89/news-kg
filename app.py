@@ -43,7 +43,6 @@ app = Dash(
         dbc.themes.YETI,
         dbc.icons.BOOTSTRAP,
         stylesheets.VIS_NETWORK_STYLESHEET,
-        dbc.icons.BOOTSTRAP
     ],
     meta_tags=[
         {'name': 'viewport',
@@ -196,8 +195,20 @@ app.layout = dbc.Container(
                             ],
                             id='spiner-1',
                             color='primary',
-                            delay_show=7_000,
+                            delay_show=8_000,
                             size='md'
+                        ),
+                        html.P(
+                            children=[
+                                [html.I(className="bi bi-circle-fill", style={'color': '#FB7F81'}), " Entidades"],
+                                [html.I(className="bi bi-circle-fill", style={'color': '#FFFF01'}), " Noticias"]
+                            ],
+                            className='bg-opacity-0 z-3 position-absolute',
+                            style={
+                                'backgroundColor': 'transparent',
+                                'width': '250px',
+                                'left': 200
+                            }
                         ),
                         modal_no_news
                     ],
