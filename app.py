@@ -193,7 +193,7 @@ app.layout = dbc.Container(
                                 'backgroundColor': 'transparent',
                                 'width': '250px',
                                 'top': 90,
-                                'right': 5
+                                'right': 1
                             }
                         ),
                         html.P(
@@ -206,7 +206,7 @@ app.layout = dbc.Container(
                                 'backgroundColor': 'transparent',
                                 'width': '250px',
                                 'top': 40,
-                                'right': 5
+                                'right': 1
                             }
                         ),
                         html.P(
@@ -219,7 +219,7 @@ app.layout = dbc.Container(
                                 'backgroundColor': 'transparent',
                                 'width': '250px',
                                 'top': 65,
-                                'right': 5
+                                'right': 1
                             }
                         ),
                         dbc.Spinner(
