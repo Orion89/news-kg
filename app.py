@@ -192,6 +192,7 @@ app.layout = dbc.Container(
                             style={
                                 'backgroundColor': 'transparent',
                                 'width': '250px',
+                                'top': 90,
                                 'right': 5
                             }
                         ),
