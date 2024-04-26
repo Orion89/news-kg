@@ -48,7 +48,7 @@ physics_ = {
         'avoidOverlap': 0.1
     },
     'stabilization': {
-        'iterations': 400
+        'iterations': 300
     }
 }
 
@@ -94,6 +94,7 @@ default_options_ = dict(
     autoResize=True,
     # height=height_,
     # width=width_,
+    locale="es",
     configure=configure_,
     # nodes=nodes_,
     # edges=edges_,

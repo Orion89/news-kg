@@ -264,7 +264,7 @@ def generate_kg_llm(news_data_llm) -> Dict[str, List]:
             'shape': 'dot',
             'font': {
                 'color': 'white',
-                'size': 17
+                'size': 28
             }
         }
         nodes.append(media_node)
@@ -281,7 +281,7 @@ def generate_kg_llm(news_data_llm) -> Dict[str, List]:
             'shape': 'dot',
             'font': {
                 'color': 'white',
-                'size': 17
+                'size': 24
             }
         }
         nodes.append(news_node)
@@ -294,9 +294,13 @@ def generate_kg_llm(news_data_llm) -> Dict[str, List]:
             'arrows': 'to',
             'font': {
                         'color': '#D3D3D3',
-                        'size': 10,
+                        'size': 12,
                         'strokeWidth': 0
-                    }
+                    },
+            'color': {
+                'color': '#9ecae1'
+            },
+            'width': 1.5
         }
         edges.append(news_to_media_edge)
         for triple in data_dict['triplets']:
@@ -313,7 +317,7 @@ def generate_kg_llm(news_data_llm) -> Dict[str, List]:
                     'mass': 7,
                     'font': {
                         'color': 'white',
-                        'size': 17
+                        'size': 20
                     }
                 }
                 nodes.append(head_node)
@@ -329,7 +333,7 @@ def generate_kg_llm(news_data_llm) -> Dict[str, List]:
                     'mass': 7,
                     'font': {
                         'color': 'white',
-                        'size': 17
+                        'size': 20
                     }
                 }
                 nodes.append(tail_node)
@@ -346,9 +350,14 @@ def generate_kg_llm(news_data_llm) -> Dict[str, List]:
                         'length': 300,
                         'font': {
                                 'color': '#D3D3D3',
-                                'size': 10,
+                                'size': 14,
                                 'strokeWidth': 0
-                            }
+                            },
+                        'smooth': {
+                            'enabled': True,
+                            'type': 'continuous'
+                        },
+                        'width': 2.0
                     }
                     edges.append(head_to_tail_edge)
             if head_added:
@@ -365,7 +374,11 @@ def generate_kg_llm(news_data_llm) -> Dict[str, List]:
                                 'color': '#D3D3D3',
                                 'size': 10,
                                 'strokeWidth': 0
-                            }
+                            },
+                        'smooth': {
+                            'enabled': True,
+                            'type': 'continuous'
+                        }
                     }
                     edges.append(head_to_news_edge)
             if tail_added:
@@ -382,7 +395,11 @@ def generate_kg_llm(news_data_llm) -> Dict[str, List]:
                                 'color': '#D3D3D3',
                                 'size': 10,
                                 'strokeWidth': 0
-                            }
+                            },
+                        'smooth': {
+                            'enabled': True,
+                            'type': 'continuous'
+                        }
                     }
                     edges.append(tail_to_news_edge)
             
