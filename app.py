@@ -205,7 +205,7 @@ app.layout = dbc.Container(
                                     style={
                                         "backgroundColor": "transparent",
                                         "width": "250px",
-                                        "top": 90,
+                                        "top": 120,  # 90
                                         "right": 1,
                                     },
                                 ),
@@ -223,7 +223,7 @@ app.layout = dbc.Container(
                                     style={
                                         "backgroundColor": "transparent",
                                         "width": "250px",
-                                        "top": 40,
+                                        "top": 70,  # 40
                                         "right": 1,
                                     },
                                 ),
@@ -241,12 +241,12 @@ app.layout = dbc.Container(
                                     style={
                                         "backgroundColor": "transparent",
                                         "width": "250px",
-                                        "top": 65,
+                                        "top": 95,  # 65
                                         "right": 1,
                                     },
                                 ),
                             ],
-                            style={"backgroundColor": "transparent", "top": 50},
+                            style={"backgroundColor": "transparent", "top": 70},
                         ),
                         dbc.Spinner(
                             children=[
