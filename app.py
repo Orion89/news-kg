@@ -246,7 +246,7 @@ app.layout = dbc.Container(
                                     },
                                 ),
                             ],
-                            style={"backgroundColor": "transparent"},
+                            style={"backgroundColor": "transparent", "top": 50},
                         ),
                         dbc.Spinner(
                             children=[
