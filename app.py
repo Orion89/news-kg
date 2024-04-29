@@ -46,6 +46,11 @@ news_loaded = os.getenv("NEWS_LOADED")
 print(f"News loaded?: {news_loaded}")
 print(f"News processed with LLM: {len(news_with_entities_llm)}")
 print(f"News processed with Spacy: {len(news_with_entities_spacy)}")
+print("========== examples ==========")
+print(news_with_entities_llm[0])
+print()
+print(news_with_entities_llm[-1])
+print("==============================")
 # extraction types: LLM, SPACY, LLM+SPACY
 ENTITY_EXTRACTION_TYPE = "LLM"
 
@@ -243,7 +248,7 @@ app.layout = dbc.Container(
                                     style={
                                         "backgroundColor": "transparent",
                                         "width": "250px",
-                                        "top": 95,  # 65
+                                        "bottom": 15,  # 65
                                         "right": 1,
                                     },
                                 ),
