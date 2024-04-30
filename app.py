@@ -196,6 +196,7 @@ app.layout = dbc.Container(
                                 # 'width': '100%',
                             },
                         ),
+                        ### Legend
                         html.Div(
                             children=[
                                 html.P(
@@ -248,13 +249,13 @@ app.layout = dbc.Container(
                                     style={
                                         "backgroundColor": "transparent",
                                         "width": "250px",
-                                        "bottom": 15,  # 65
+                                        "top": 65,  # 65 | 15
                                         "right": 1,
                                     },
                                 ),
                             ],
                             style={"backgroundColor": "transparent", "top": 70},
-                            className="z-3 position-absolute",
+                            className="z-3",
                         ),
                         dbc.Spinner(
                             children=[
