@@ -208,7 +208,7 @@ app.layout = dbc.Container(
                                             " Entidades", style={"color": "#FB7F81"}
                                         ),
                                     ],
-                                    className="bg-opacity-0 z-3 position-absolute",
+                                    className="bg-opacity-0 z-3 position-absolute",  # position-absolute
                                     style={
                                         "backgroundColor": "transparent",
                                         "width": "250px",
@@ -226,7 +226,7 @@ app.layout = dbc.Container(
                                             " Noticias", style={"color": "#FFFF01"}
                                         ),
                                     ],
-                                    className="bg-opacity-0 z-3 position-absolute",
+                                    className="bg-opacity-0 z-3 position-absolute",  # position-absolute
                                     style={
                                         "backgroundColor": "transparent",
                                         "width": "250px",
@@ -244,7 +244,7 @@ app.layout = dbc.Container(
                                             " Medios", style={"color": "#98C2FC"}
                                         ),
                                     ],
-                                    className="bg-opacity-0 z-3 position-absolute",
+                                    className="bg-opacity-0 z-3 position-absolute",  # position-absolute
                                     style={
                                         "backgroundColor": "transparent",
                                         "width": "250px",
@@ -254,6 +254,7 @@ app.layout = dbc.Container(
                                 ),
                             ],
                             style={"backgroundColor": "transparent", "top": 70},
+                            className="z-3 position-absolute",
                         ),
                         dbc.Spinner(
                             children=[
