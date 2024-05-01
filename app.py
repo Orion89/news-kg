@@ -38,6 +38,7 @@ from utils.get_size import getsize
 from network_options.options import default_options_
 from sections.header import header
 from sections.modals import modal, modal_no_news
+from sections.footer import main_footer
 
 
 warnings.filterwarnings("ignore")
@@ -132,7 +133,9 @@ app.layout = dbc.Container(
                 dbc.Col(
                     [
                         html.P(
-                            "Haz zoom y/o selecciona un nodo para ver más información.",
+                            children=[
+                                "Haz zoom y/o selecciona un nodo para ver más información.",
+                            ],
                             className="text-light",
                         ),
                         modal,
@@ -249,7 +252,7 @@ app.layout = dbc.Container(
                                     style={
                                         "backgroundColor": "transparent",
                                         "width": "250px",
-                                        "top": 65,  # 65 | 15
+                                        "top": 85,  # 65 | 15
                                         "right": 1,
                                     },
                                 ),
@@ -317,7 +320,7 @@ app.layout = dbc.Container(
                     [
                         html.P(
                             children=[
-                                "Nodos representan entidades (extraídas con Spacy) mencionadas en noticias. Se forma una arista entre una entidad y un nodo noticia si esa última hace mención de la primera."
+                                "Nodos amarillos representan entidades (extraídas con Mixtral 8x22B y Spacy) mencionadas en noticias. Una arista entre dos nodos de entidades corresponden a relaciones identificadas por un LLM y se identifican por su etiqueta."
                             ],
                             className="text-light text-end",
                         )
@@ -329,47 +332,7 @@ app.layout = dbc.Container(
         dbc.Row(  # FOOTER
             [
                 dbc.Col(
-                    [
-                        # html.Div(id='user-info', className='invisible m-0'),
-                        dbc.Card(
-                            [
-                                dbc.CardFooter(
-                                    [
-                                        html.P(
-                                            [
-                                                html.A(
-                                                    children=[
-                                                        html.I(className="bi bi-github")
-                                                    ],
-                                                    disable_n_clicks=True,
-                                                    href="https://github.com/Orion89",
-                                                    title="GitHub profile",
-                                                ),
-                                                "  ",
-                                                html.A(
-                                                    children=[
-                                                        html.I(
-                                                            className="bi bi-linkedin"
-                                                        )
-                                                    ],
-                                                    disable_n_clicks=True,
-                                                    href="https://www.linkedin.com/in/leonardo-molina-v-68a601183/",
-                                                    title="LinkedIn profile",
-                                                ),
-                                                " 2024 Leonardo Molina V.",
-                                            ],
-                                            className="fs-5 text-light",
-                                        ),
-                                        html.P(
-                                            "Proyecto académico. El autor no se hace responsable del mal uso del contenido.",
-                                            className="text-light",
-                                        ),
-                                    ]
-                                )
-                            ],
-                            style={"background": "#222222"},
-                        )
-                    ],
+                    [main_footer],
                     class_name="mt-4",
                     width={"size": 12},
                 )
