@@ -99,15 +99,15 @@ elif ENTITY_EXTRACTION_TYPE == "LLM":
 elif ENTITY_EXTRACTION_TYPE == "LLM+SPACY":
     raise NotImplementedError("El método aún no se implementa.")
 
-network_1 = DashNetwork(
-    id="kg_news-1",
-    style={"height": "800px", "width": "100%", "background": "#222222"},
-    data={"nodes": data_for_kg["nodes"], "edges": data_for_kg["edges"]},
-    options=default_options_,
-    enableHciEvents=True,
-    enablePhysicsEvents=False,
-    enableOtherEvents=False,
-)
+# network_1 = DashNetwork(
+#     id="kg_news-1",
+#     style={"height": "800px", "width": "100%", "background": "#222222"},
+#     data={"nodes": data_for_kg["nodes"], "edges": data_for_kg["edges"]},
+#     options=default_options_,
+#     enableHciEvents=True,
+#     enablePhysicsEvents=False,
+#     enableOtherEvents=False,
+# )
 
 # Layout
 app.layout = dbc.Container(
@@ -182,6 +182,9 @@ app.layout = dbc.Container(
                 # ),
                 dbc.Col(
                     [
+                        dcc.Store(
+                            id="store-2", storage_type="memory", data=data_for_kg
+                        ),
                         dcc.Dropdown(
                             id="dropdown-2",
                             clearable=False,
@@ -198,6 +201,9 @@ app.layout = dbc.Container(
                                 # 'left': 0,
                                 # 'width': '100%',
                             },
+                        ),
+                        dbc.Button(
+                            "Generar", size="md", n_clicks=1, className="invisible"
                         ),
                         ### Legend
                         html.Div(
@@ -252,7 +258,7 @@ app.layout = dbc.Container(
                                     style={
                                         "backgroundColor": "transparent",
                                         "width": "250px",
-                                        "top": 85,  # 65 | 15
+                                        "top": 95,  # 65 | 15 | 85
                                         "right": 1,
                                     },
                                 ),
@@ -263,7 +269,7 @@ app.layout = dbc.Container(
                         dbc.Spinner(
                             children=[
                                 html.Div(
-                                    children=[network_1],
+                                    # children=[network_1],
                                     id="network-1",
                                     className="mt-0",
                                 )
@@ -369,6 +375,49 @@ app.layout = dbc.Container(
 #             return ''
 #     else:
 #         return '' # no_update
+
+
+@callback(
+    Output("network-1", "children"),
+    Output("store-2", "data"),
+    Input("gen-kg-button-1", "n_clicks"),
+)
+def generate_news_kg(n_clicks):
+
+    if ENTITY_EXTRACTION_TYPE == "SPACY":
+        data_for_kg, _ = generate_kg_spacy(
+            news_list=news_with_entities_spacy,
+            ntity_types=entity_types_list,
+            colors=colors,
+            color_converter=rgb2hex,
+        )
+        media_names = get_media_in_db(
+            conn, year=today.year, month=today.month, day=(today - time_delta).day
+        )
+    elif ENTITY_EXTRACTION_TYPE == "LLM":
+        data_for_kg = generate_kg_llm(news_data_llm=news_with_entities_llm)
+        media_names = list(
+            set(
+                [
+                    urlparse(news_dict["url"]).netloc
+                    for news_dict in news_with_entities_llm
+                ]
+            )
+        )
+    elif ENTITY_EXTRACTION_TYPE == "LLM+SPACY":
+        raise NotImplementedError("El método aún no se implementa.")
+
+    network_1 = DashNetwork(
+        id="kg_news-1",
+        style={"height": "800px", "width": "100%", "background": "#222222"},
+        data={"nodes": data_for_kg["nodes"], "edges": data_for_kg["edges"]},
+        options=default_options_,
+        enableHciEvents=True,
+        enablePhysicsEvents=False,
+        enableOtherEvents=False,
+    )
+
+    return network_1, data_for_kg
 
 
 @callback(
@@ -510,12 +559,13 @@ def get_keywords(selected_node_dict, data):
     Output("store-1", "data"),
     Output("modal-2", "is_open", allow_duplicate=True),
     Input("dropdown-1", "value"),
+    State("store-2", "data"),
     prevent_initial_call=True,
 )
-def update_kg_1(selected_media):
+def update_kg_1(selected_media, data_stored):
     if selected_media == "Todos":
         return (
-            {"nodes": data_for_kg["nodes"], "edges": data_for_kg["edges"]},
+            {"nodes": data_stored["nodes"], "edges": data_stored["edges"]},
             news_with_entities,
             False,
         )
