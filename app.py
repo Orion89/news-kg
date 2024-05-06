@@ -188,9 +188,9 @@ app.layout = dbc.Container(
                         dcc.Store(
                             id="store-2", storage_type="memory", data=data_for_kg
                         ),
-                        html.Div(
-                            id="hidden-div", children=[], style={"display": "none"}
-                        ),
+                        # html.Div(
+                        #     id="hidden-div", children=[], style={"display": "none"}
+                        # ),
                         dcc.Interval(
                             id="load-interval-1",
                             n_intervals=0,
@@ -281,7 +281,7 @@ app.layout = dbc.Container(
                         dbc.Spinner(
                             children=[
                                 html.Div(
-                                    # children=[network_1],
+                                    children=[network_1],
                                     id="network-1",
                                     className="mt-0",
                                 )
@@ -438,7 +438,7 @@ def generate_news_kg(n_intervals):
     #     enablePhysicsEvents=False,
     #     enableOtherEvents=False,
     # )
-    if n_intervals > 0:
+    if n_intervals >= 0:
         return {
             "nodes": data_for_kg["nodes"],
             "edges": data_for_kg["edges"],
