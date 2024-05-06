@@ -188,6 +188,9 @@ app.layout = dbc.Container(
                         dcc.Store(
                             id="store-2", storage_type="memory", data=data_for_kg
                         ),
+                        html.Div(
+                            id="hidden-div", children=[], style={"display": "none"}
+                        ),
                         dcc.Dropdown(
                             id="dropdown-2",
                             clearable=False,
@@ -205,9 +208,9 @@ app.layout = dbc.Container(
                                 # 'width': '100%',
                             },
                         ),
-                        dbc.Button(
-                            "Generar", size="md", n_clicks=1, class_name="invisible"
-                        ),
+                        # dbc.Button(
+                        #     "Generar", size="md", n_clicks=1, class_name="invisible"
+                        # ),
                         ### Legend
                         html.Div(
                             children=[
@@ -383,9 +386,9 @@ app.layout = dbc.Container(
 @callback(
     Output("kg_news-1", "data"),
     Output("store-2", "data"),
-    Input("gen-kg-button-1", "n_clicks"),
+    Input("hidden-div", "children"),
 )
-def generate_news_kg(n_clicks):
+def generate_news_kg(div_children):
 
     mongo_client = MongoClient(
         host=settings_for_mongo.MONGOHOST,
