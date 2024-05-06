@@ -102,15 +102,15 @@ elif ENTITY_EXTRACTION_TYPE == "LLM":
 elif ENTITY_EXTRACTION_TYPE == "LLM+SPACY":
     raise NotImplementedError("El método aún no se implementa.")
 
-network_1 = DashNetwork(
-    id="kg_news-1",
-    style={"height": "800px", "width": "100%", "background": "#222222"},
-    # data={"nodes": data_for_kg["nodes"], "edges": data_for_kg["edges"]},
-    options=default_options_,
-    enableHciEvents=True,
-    enablePhysicsEvents=False,
-    enableOtherEvents=False,
-)
+# network_1 = DashNetwork(
+#     id="kg_news-1",
+#     style={"height": "800px", "width": "100%", "background": "#222222"},
+#     # data={"nodes": data_for_kg["nodes"], "edges": data_for_kg["edges"]},
+#     options=default_options_,
+#     enableHciEvents=True,
+#     enablePhysicsEvents=False,
+#     enableOtherEvents=False,
+# )
 
 # Layout
 app.layout = dbc.Container(
@@ -281,7 +281,7 @@ app.layout = dbc.Container(
                         dbc.Spinner(
                             children=[
                                 html.Div(
-                                    children=[network_1],
+                                    # children=[network_1],
                                     id="network-1",
                                     className="mt-0",
                                 )
@@ -390,7 +390,7 @@ app.layout = dbc.Container(
 
 
 @callback(
-    Output("kg_news-1", "data"),
+    Output("network-1", "children"),
     Output("store-2", "data"),
     Input("load-interval-1", "n_intervals"),
 )
@@ -429,20 +429,17 @@ def generate_news_kg(n_intervals):
     elif ENTITY_EXTRACTION_TYPE == "LLM+SPACY":
         raise NotImplementedError("El método aún no se implementa.")
 
-    # network_1 = DashNetwork(
-    #     id="kg_news-1",
-    #     style={"height": "800px", "width": "100%", "background": "#222222"},
-    #     data={"nodes": data_for_kg["nodes"], "edges": data_for_kg["edges"]},
-    #     options=default_options_,
-    #     enableHciEvents=True,
-    #     enablePhysicsEvents=False,
-    #     enableOtherEvents=False,
-    # )
+    network_1 = DashNetwork(
+        id="kg_news-1",
+        style={"height": "800px", "width": "100%", "background": "#222222"},
+        data={"nodes": data_for_kg["nodes"], "edges": data_for_kg["edges"]},
+        options=default_options_,
+        enableHciEvents=True,
+        enablePhysicsEvents=False,
+        enableOtherEvents=False,
+    )
     if n_intervals >= 0:
-        return {
-            "nodes": data_for_kg["nodes"],
-            "edges": data_for_kg["edges"],
-        }, data_for_kg
+        return network_1, data_for_kg
     else:
         return no_update, no_update
 
