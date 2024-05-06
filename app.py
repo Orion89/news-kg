@@ -191,6 +191,12 @@ app.layout = dbc.Container(
                         html.Div(
                             id="hidden-div", children=[], style={"display": "none"}
                         ),
+                        dcc.Interval(
+                            id="load-interval-1",
+                            n_intervals=0,
+                            max_intervals=0,  # <-- only run once
+                            interval=1,
+                        ),
                         dcc.Dropdown(
                             id="dropdown-2",
                             clearable=False,
@@ -386,10 +392,10 @@ app.layout = dbc.Container(
 @callback(
     Output("kg_news-1", "data"),
     Output("store-2", "data"),
-    Input("hidden-div", "children"),
+    Input("load-interval-1", "n_intervals"),
 )
-def generate_news_kg(div_children):
-
+def generate_news_kg(n_intervals):
+    print("Call generate_news_kg function")
     mongo_client = MongoClient(
         host=settings_for_mongo.MONGOHOST,
         port=settings_for_mongo.MONGOPORT,
@@ -432,8 +438,13 @@ def generate_news_kg(div_children):
     #     enablePhysicsEvents=False,
     #     enableOtherEvents=False,
     # )
-
-    return {"nodes": data_for_kg["nodes"], "edges": data_for_kg["edges"]}, data_for_kg
+    if n_intervals > 0:
+        return {
+            "nodes": data_for_kg["nodes"],
+            "edges": data_for_kg["edges"],
+        }, data_for_kg
+    else:
+        return no_update, no_update
 
 
 @callback(
