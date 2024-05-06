@@ -20,12 +20,15 @@ from matplotlib.cm import get_cmap
 import pytextrank
 
 from config.db import conn
+from pymongo import MongoClient
+from config.mongo import settings_for_mongo
 from extract.extract_entities import (
     news_with_entities_spacy,
     nlp,
     extract_entities_spacy,
     news_with_entities_llm,
     news_ids_without_llm_entities,
+    extract_entities_llm,
 )
 from extract.extract_news import get_news, get_media_in_db, today, time_delta
 from generate_networks import (
@@ -203,7 +206,7 @@ app.layout = dbc.Container(
                             },
                         ),
                         dbc.Button(
-                            "Generar", size="md", n_clicks=1, className="invisible"
+                            "Generar", size="md", n_clicks=1, class_name="invisible"
                         ),
                         ### Legend
                         html.Div(
@@ -269,7 +272,7 @@ app.layout = dbc.Container(
                         dbc.Spinner(
                             children=[
                                 html.Div(
-                                    children=[network_1],
+                                    # children=[network_1],
                                     id="network-1",
                                     className="mt-0",
                                 )
@@ -384,6 +387,13 @@ app.layout = dbc.Container(
 )
 def generate_news_kg(n_clicks):
 
+    mongo_client = MongoClient(
+        host=settings_for_mongo.MONGOHOST,
+        port=settings_for_mongo.MONGOPORT,
+        username=settings_for_mongo.MONGOUSER,
+        password=settings_for_mongo.MONGOPASSWORD,
+    )
+
     if ENTITY_EXTRACTION_TYPE == "SPACY":
         data_for_kg, _ = generate_kg_spacy(
             news_list=news_with_entities_spacy,
@@ -395,6 +405,9 @@ def generate_news_kg(n_clicks):
             conn, year=today.year, month=today.month, day=(today - time_delta).day
         )
     elif ENTITY_EXTRACTION_TYPE == "LLM":
+        news_with_entities_llm, _ = extract_entities_llm(
+            client=mongo_client, delta_days=1
+        )
         data_for_kg = generate_kg_llm(news_data_llm=news_with_entities_llm)
         media_names = list(
             set(
