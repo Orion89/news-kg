@@ -185,13 +185,10 @@ app.layout = dbc.Container(
                 # ),
                 dbc.Col(
                     [
-                        dcc.Store(
+                        dcc.Store(  # store for netkork data: {'nodes': list, 'edges': list}
                             id="store-2", storage_type="memory", data=data_for_kg
                         ),
-                        # html.Div(
-                        #     id="hidden-div", children=[], style={"display": "none"}
-                        # ),
-                        dcc.Interval(
+                        dcc.Interval(  # interval for auto calling generate_news_kg callback
                             id="load-interval-1",
                             n_intervals=0,
                             max_intervals=0,  # <-- only run once
@@ -214,9 +211,6 @@ app.layout = dbc.Container(
                                 # 'width': '100%',
                             },
                         ),
-                        # dbc.Button(
-                        #     "Generar", size="md", n_clicks=1, class_name="invisible"
-                        # ),
                         ### Legend
                         html.Div(
                             children=[
@@ -330,7 +324,9 @@ app.layout = dbc.Container(
                             className="bg-opacity-0",
                             style={"backgroundColor": "#222222"},
                         ),
-                        dcc.Store(id="store-1", storage_type="session"),
+                        dcc.Store(
+                            id="store-1", storage_type="session", data=data_for_kg
+                        ),
                     ],
                     width={"size": 5, "offset": 0},
                 ),
@@ -391,7 +387,7 @@ app.layout = dbc.Container(
 
 @callback(
     Output("network-1", "children"),
-    Output("store-2", "data"),
+    Output("store-1", "data"),
     Input("load-interval-1", "n_intervals"),
 )
 def generate_news_kg(n_intervals):
@@ -509,6 +505,7 @@ def show_news_date(selected_node_dict, data):
     prevent_initial_call=True,
 )
 def get_keywords(selected_node_dict, data):
+    print(f"node data: {selected_node_dict}")
     if not data:
         data = news_with_entities  # return [{'label': '', 'value': ''}], ['']
     n = 5
@@ -533,49 +530,49 @@ def get_keywords(selected_node_dict, data):
         return [{"label": "", "value": ""}], [""]
 
 
-@callback(
-    Output("dropdown-3", "options"),
-    Output("dropdown-3", "value"),
-    Input("kg_news-1", "selectNode"),
-    State("store-1", "data"),
-    prevent_initial_call=True,
-)
-def get_keywords(selected_node_dict, data):
-    if not data:
-        data = news_with_entities  # return [{'label': '', 'value': ''}], ['']
-    n = 5
-    node_selected_id = selected_node_dict["nodes"][0]
-    selected_news = [
-        news_dict for news_dict in data if news_dict["id"] == node_selected_id
-    ]
-    if selected_news:
-        selected_news = selected_news[0]
-    else:
-        return [
-            {
-                "label": "",
-                "value": "",
-            }
-        ], [""]
-    if selected_news["body_text"]:
-        doc_ = nlp(selected_news["body_text"])
-        options = []
-        value = []
-        for kw in doc_._.phrases[:n]:
-            if kw.text not in [token for token in doc_ if not token.is_stop]:
-                options.append(
-                    {
-                        "label": html.Span(
-                            [html.I(className="bi bi-bookmark-dash"), f"{kw.text}"],
-                            style={"color": "white", "font-size": 16},
-                        ),
-                        "value": kw.text,
-                    }
-                )
-                value.append(kw.text)
-        return options, value
-    else:
-        return [{"label": "", "value": ""}], [""]
+# @callback(
+#     Output("dropdown-3", "options"),
+#     Output("dropdown-3", "value"),
+#     Input("kg_news-1", "selectNode"),
+#     State("store-1", "data"),
+#     prevent_initial_call=True,
+# )
+# def get_keywords(selected_node_dict, data):
+#     if not data:
+#         data = news_with_entities  # return [{'label': '', 'value': ''}], ['']
+#     n = 5
+#     node_selected_id = selected_node_dict["nodes"][0]
+#     selected_news = [
+#         news_dict for news_dict in data if news_dict["id"] == node_selected_id
+#     ]
+#     if selected_news:
+#         selected_news = selected_news[0]
+#     else:
+#         return [
+#             {
+#                 "label": "",
+#                 "value": "",
+#             }
+#         ], [""]
+#     if selected_news["body_text"]:
+#         doc_ = nlp(selected_news["body_text"])
+#         options = []
+#         value = []
+#         for kw in doc_._.phrases[:n]:
+#             if kw.text not in [token for token in doc_ if not token.is_stop]:
+#                 options.append(
+#                     {
+#                         "label": html.Span(
+#                             [html.I(className="bi bi-bookmark-dash"), f"{kw.text}"],
+#                             style={"color": "white", "font-size": 16},
+#                         ),
+#                         "value": kw.text,
+#                     }
+#                 )
+#                 value.append(kw.text)
+#         return options, value
+#     else:
+#         return [{"label": "", "value": ""}], [""]
 
 
 @callback(
