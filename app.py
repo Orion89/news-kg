@@ -47,7 +47,9 @@ from sections.footer import main_footer
 warnings.filterwarnings("ignore")
 
 news_loaded = os.getenv("NEWS_LOADED")
-print(f"News loaded?: {news_loaded}")
+print(
+    f"News loaded?: {news_loaded}"
+)  # Flag for scraping news (other service in Railway) state
 print(f"News processed with LLM: {len(news_with_entities_llm)}")
 print(f"News processed with Spacy: {len(news_with_entities_spacy)}")
 print("========== examples ==========")
@@ -190,9 +192,9 @@ app.layout = dbc.Container(
                         ),
                         dcc.Interval(  # interval for auto calling generate_news_kg callback
                             id="load-interval-1",
-                            n_intervals=0,
+                            n_intervals=1,
                             max_intervals=0,  # <-- only run once
-                            interval=1,
+                            interval=1000,
                         ),
                         dcc.Dropdown(
                             id="dropdown-2",
