@@ -232,11 +232,16 @@ def generate_kg_llm(news_data_llm) -> Dict[str, List]:
     for media_name in list(news_media):
         media_node = {
             "id": media_ids[media_name],
+            "size": 60,
             "label": media_name,
             "title": media_name,
             "group": "MEDIA",
             "shape": "dot",
-            "font": {"color": "white", "size": 28},
+            "font": {
+                "color": "white",
+                "size": 30,
+                "bold": {"color": "white", "size": 30, "face": "arial", "mod": "bold"},
+            },
         }
         nodes.append(media_node)
 
@@ -245,6 +250,7 @@ def generate_kg_llm(news_data_llm) -> Dict[str, List]:
     for data_dict in news_data_llm:
         news_node = {
             "id": data_dict["_id"],
+            "size": 45,
             "title": data_dict["url"],
             "label": f"noticia_{data_dict['_id']}",
             "group": "NEWS",
@@ -275,6 +281,7 @@ def generate_kg_llm(news_data_llm) -> Dict[str, List]:
                 head_node = {
                     "id": head_id,
                     "label": triple["head"],
+                    "size": 35,
                     "title": triple["type_head"],
                     "group": "ENTITIES",
                     "shape": "dot",
@@ -288,6 +295,7 @@ def generate_kg_llm(news_data_llm) -> Dict[str, List]:
                 tail_node = {
                     "id": tail_id,
                     "label": triple["tail"],
+                    "size": 35,
                     "title": triple["type_tail"],
                     "group": "ENTITIES",
                     "shape": "dot",
