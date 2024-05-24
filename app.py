@@ -20,15 +20,12 @@ from matplotlib.cm import get_cmap
 import pytextrank
 
 from config.db import conn
-from pymongo import MongoClient
-from config.mongo import settings_for_mongo
 from extract.extract_entities import (
     news_with_entities_spacy,
     nlp,
     extract_entities_spacy,
     news_with_entities_llm,
     news_ids_without_llm_entities,
-    extract_entities_llm,
 )
 from extract.extract_news import get_news, get_media_in_db, today, time_delta
 from generate_networks import (
@@ -47,9 +44,7 @@ from sections.footer import main_footer
 warnings.filterwarnings("ignore")
 
 news_loaded = os.getenv("NEWS_LOADED")
-print(
-    f"News loaded?: {news_loaded}"
-)  # Flag for scraping news (other service in Railway) state
+print(f"News loaded?: {news_loaded}")
 print(f"News processed with LLM: {len(news_with_entities_llm)}")
 print(f"News processed with Spacy: {len(news_with_entities_spacy)}")
 print("========== examples ==========")
@@ -104,15 +99,15 @@ elif ENTITY_EXTRACTION_TYPE == "LLM":
 elif ENTITY_EXTRACTION_TYPE == "LLM+SPACY":
     raise NotImplementedError("El método aún no se implementa.")
 
-# network_1 = DashNetwork(
-#     id="kg_news-1",
-#     style={"height": "800px", "width": "100%", "background": "#222222"},
-#     # data={"nodes": data_for_kg["nodes"], "edges": data_for_kg["edges"]},
-#     options=default_options_,
-#     enableHciEvents=True,
-#     enablePhysicsEvents=False,
-#     enableOtherEvents=False,
-# )
+network_1 = DashNetwork(
+    id="kg_news-1",
+    style={"height": "800px", "width": "100%", "background": "#222222"},
+    data={"nodes": data_for_kg["nodes"], "edges": data_for_kg["edges"]},
+    options=default_options_,
+    enableHciEvents=True,
+    enablePhysicsEvents=False,
+    enableOtherEvents=False,
+)
 
 # Layout
 app.layout = dbc.Container(
@@ -187,15 +182,6 @@ app.layout = dbc.Container(
                 # ),
                 dbc.Col(
                     [
-                        dcc.Store(  # store for netkork data: {'nodes': list, 'edges': list}
-                            id="store-2", storage_type="memory", data=data_for_kg
-                        ),
-                        dcc.Interval(  # interval for auto calling generate_news_kg callback
-                            id="load-interval-1",
-                            n_intervals=1,
-                            max_intervals=0,  # <-- only run once
-                            interval=1000,
-                        ),
                         dcc.Dropdown(
                             id="dropdown-2",
                             clearable=False,
@@ -266,7 +252,7 @@ app.layout = dbc.Container(
                                     style={
                                         "backgroundColor": "transparent",
                                         "width": "250px",
-                                        "top": 95,  # 65 | 15 | 85
+                                        "top": 85,  # 65 | 15
                                         "right": 1,
                                     },
                                 ),
@@ -277,7 +263,7 @@ app.layout = dbc.Container(
                         dbc.Spinner(
                             children=[
                                 html.Div(
-                                    # children=[network_1],
+                                    children=[network_1],
                                     id="network-1",
                                     className="mt-0",
                                 )
@@ -326,9 +312,7 @@ app.layout = dbc.Container(
                             className="bg-opacity-0",
                             style={"backgroundColor": "#222222"},
                         ),
-                        dcc.Store(
-                            id="store-1", storage_type="session", data=data_for_kg
-                        ),
+                        dcc.Store(id="store-1", storage_type="session"),
                     ],
                     width={"size": 5, "offset": 0},
                 ),
@@ -385,61 +369,6 @@ app.layout = dbc.Container(
 #             return ''
 #     else:
 #         return '' # no_update
-
-
-@callback(
-    Output("network-1", "children"),
-    Output("store-1", "data"),
-    Input("load-interval-1", "n_intervals"),
-)
-def generate_news_kg(n_intervals):
-    print("Call generate_news_kg function")
-    mongo_client = MongoClient(
-        host=settings_for_mongo.MONGOHOST,
-        port=settings_for_mongo.MONGOPORT,
-        username=settings_for_mongo.MONGOUSER,
-        password=settings_for_mongo.MONGOPASSWORD,
-    )
-
-    if ENTITY_EXTRACTION_TYPE == "SPACY":
-        data_for_kg, _ = generate_kg_spacy(
-            news_list=news_with_entities_spacy,
-            ntity_types=entity_types_list,
-            colors=colors,
-            color_converter=rgb2hex,
-        )
-        media_names = get_media_in_db(
-            conn, year=today.year, month=today.month, day=(today - time_delta).day
-        )
-    elif ENTITY_EXTRACTION_TYPE == "LLM":
-        news_with_entities_llm, _ = extract_entities_llm(
-            client=mongo_client, delta_days=1
-        )
-        data_for_kg = generate_kg_llm(news_data_llm=news_with_entities_llm)
-        media_names = list(
-            set(
-                [
-                    urlparse(news_dict["url"]).netloc
-                    for news_dict in news_with_entities_llm
-                ]
-            )
-        )
-    elif ENTITY_EXTRACTION_TYPE == "LLM+SPACY":
-        raise NotImplementedError("El método aún no se implementa.")
-
-    network_1 = DashNetwork(
-        id="kg_news-1",
-        style={"height": "800px", "width": "100%", "background": "#222222"},
-        data={"nodes": data_for_kg["nodes"], "edges": data_for_kg["edges"]},
-        options=default_options_,
-        enableHciEvents=True,
-        enablePhysicsEvents=False,
-        enableOtherEvents=False,
-    )
-    if n_intervals >= 0:
-        return network_1, data_for_kg
-    else:
-        return no_update, no_update
 
 
 @callback(
@@ -507,7 +436,6 @@ def show_news_date(selected_node_dict, data):
     prevent_initial_call=True,
 )
 def get_keywords(selected_node_dict, data):
-    print(f"node data: {selected_node_dict}")
     if not data:
         data = news_with_entities  # return [{'label': '', 'value': ''}], ['']
     n = 5
@@ -532,49 +460,49 @@ def get_keywords(selected_node_dict, data):
         return [{"label": "", "value": ""}], [""]
 
 
-# @callback(
-#     Output("dropdown-3", "options"),
-#     Output("dropdown-3", "value"),
-#     Input("kg_news-1", "selectNode"),
-#     State("store-1", "data"),
-#     prevent_initial_call=True,
-# )
-# def get_keywords(selected_node_dict, data):
-#     if not data:
-#         data = news_with_entities  # return [{'label': '', 'value': ''}], ['']
-#     n = 5
-#     node_selected_id = selected_node_dict["nodes"][0]
-#     selected_news = [
-#         news_dict for news_dict in data if news_dict["id"] == node_selected_id
-#     ]
-#     if selected_news:
-#         selected_news = selected_news[0]
-#     else:
-#         return [
-#             {
-#                 "label": "",
-#                 "value": "",
-#             }
-#         ], [""]
-#     if selected_news["body_text"]:
-#         doc_ = nlp(selected_news["body_text"])
-#         options = []
-#         value = []
-#         for kw in doc_._.phrases[:n]:
-#             if kw.text not in [token for token in doc_ if not token.is_stop]:
-#                 options.append(
-#                     {
-#                         "label": html.Span(
-#                             [html.I(className="bi bi-bookmark-dash"), f"{kw.text}"],
-#                             style={"color": "white", "font-size": 16},
-#                         ),
-#                         "value": kw.text,
-#                     }
-#                 )
-#                 value.append(kw.text)
-#         return options, value
-#     else:
-#         return [{"label": "", "value": ""}], [""]
+@callback(
+    Output("dropdown-3", "options"),
+    Output("dropdown-3", "value"),
+    Input("kg_news-1", "selectNode"),
+    State("store-1", "data"),
+    prevent_initial_call=True,
+)
+def get_keywords(selected_node_dict, data):
+    if not data:
+        data = news_with_entities  # return [{'label': '', 'value': ''}], ['']
+    n = 5
+    node_selected_id = selected_node_dict["nodes"][0]
+    selected_news = [
+        news_dict for news_dict in data if news_dict["id"] == node_selected_id
+    ]
+    if selected_news:
+        selected_news = selected_news[0]
+    else:
+        return [
+            {
+                "label": "",
+                "value": "",
+            }
+        ], [""]
+    if selected_news["body_text"]:
+        doc_ = nlp(selected_news["body_text"])
+        options = []
+        value = []
+        for kw in doc_._.phrases[:n]:
+            if kw.text not in [token for token in doc_ if not token.is_stop]:
+                options.append(
+                    {
+                        "label": html.Span(
+                            [html.I(className="bi bi-bookmark-dash"), f"{kw.text}"],
+                            style={"color": "white", "font-size": 16},
+                        ),
+                        "value": kw.text,
+                    }
+                )
+                value.append(kw.text)
+        return options, value
+    else:
+        return [{"label": "", "value": ""}], [""]
 
 
 @callback(
@@ -582,13 +510,12 @@ def get_keywords(selected_node_dict, data):
     Output("store-1", "data"),
     Output("modal-2", "is_open", allow_duplicate=True),
     Input("dropdown-1", "value"),
-    State("store-2", "data"),
     prevent_initial_call=True,
 )
-def update_kg_1(selected_media, data_stored):
+def update_kg_1(selected_media):
     if selected_media == "Todos":
         return (
-            {"nodes": data_stored["nodes"], "edges": data_stored["edges"]},
+            {"nodes": data_for_kg["nodes"], "edges": data_for_kg["edges"]},
             news_with_entities,
             False,
         )

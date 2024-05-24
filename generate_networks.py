@@ -233,15 +233,10 @@ def generate_kg_llm(news_data_llm) -> Dict[str, List]:
         media_node = {
             "id": media_ids[media_name],
             "label": media_name,
-            "size": 35,
             "title": media_name,
             "group": "MEDIA",
             "shape": "dot",
-            "font": {
-                "color": "white",
-                "size": 32,
-                "bold": {"color": "white", "size": 36, "face": "arial", "mod": "bold"},
-            },
+            "font": {"color": "white", "size": 28},
         }
         nodes.append(media_node)
 
@@ -250,13 +245,12 @@ def generate_kg_llm(news_data_llm) -> Dict[str, List]:
     for data_dict in news_data_llm:
         news_node = {
             "id": data_dict["_id"],
-            "size": 25,
             "title": data_dict["url"],
             "label": f"noticia_{data_dict['_id']}",
             "group": "NEWS",
             # 'color': colors_for_nodes['NEWS'],
             "shape": "dot",
-            "font": {"color": "white", "size": 24},
+            "font": {"color": "white", "size": 28},
         }
         nodes.append(news_node)
         edge_id = next(edge_id_generator)
@@ -266,7 +260,7 @@ def generate_kg_llm(news_data_llm) -> Dict[str, List]:
             "from": data_dict["_id"],
             "to": media_ids[urlparse(data_dict["url"]).netloc],
             "arrows": "to",
-            "font": {"color": "#D3D3D3", "size": 12, "strokeWidth": 0},
+            "font": {"color": "#D3D3D3", "size": 14, "strokeWidth": 0},
             "color": {"color": "#9ecae1"},
             "width": 1.5,
         }
@@ -279,12 +273,11 @@ def generate_kg_llm(news_data_llm) -> Dict[str, List]:
                 head_node = {
                     "id": head_id,
                     "label": triple["head"],
-                    "size": 30,
                     "title": triple["type_head"],
                     "group": "ENTITIES",
                     "shape": "dot",
                     "mass": 7,
-                    "font": {"color": "white", "size": 22},
+                    "font": {"color": "white", "size": 24},
                 }
                 nodes.append(head_node)
                 head_added = True
@@ -293,12 +286,11 @@ def generate_kg_llm(news_data_llm) -> Dict[str, List]:
                 tail_node = {
                     "id": tail_id,
                     "label": triple["tail"],
-                    "size": 30,
                     "title": triple["type_tail"],
                     "group": "ENTITIES",
                     "shape": "dot",
                     "mass": 7,
-                    "font": {"color": "white", "size": 22},
+                    "font": {"color": "white", "size": 24},
                 }
                 nodes.append(tail_node)
                 tail_added = True
