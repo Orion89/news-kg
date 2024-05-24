@@ -250,7 +250,7 @@ def generate_kg_llm(news_data_llm) -> Dict[str, List]:
             "group": "NEWS",
             # 'color': colors_for_nodes['NEWS'],
             "shape": "dot",
-            "font": {"color": "white", "size": 28},
+            "font": {"color": "white", "size": 26},
         }
         nodes.append(news_node)
         edge_id = next(edge_id_generator)
@@ -294,25 +294,25 @@ def generate_kg_llm(news_data_llm) -> Dict[str, List]:
                 }
                 nodes.append(tail_node)
                 tail_added = True
-            if head_added or tail_added:
-                if (head_id, tail_id) not in [
-                    (edge_dict["from"], edge_dict["to"]) for edge_dict in edges
-                ]:
-                    edge_id = next(
-                        edge_id_generator
-                    )  # Filtrar edge para evitar edges duplicados
-                    head_to_tail_edge = {
-                        "id": edge_id,
-                        "label": triple["relation"],
-                        "from": head_id,
-                        "to": tail_id,
-                        "arrows": "to",
-                        "length": 300,
-                        "font": {"color": "#D3D3D3", "size": 18, "strokeWidth": 0},
-                        "smooth": {"enabled": True, "type": "continuous"},
-                        "width": 2.0,
-                    }
-                    edges.append(head_to_tail_edge)
+            # if head_added or tail_added:  # remover esta condición
+            if (head_id, tail_id) not in [
+                (edge_dict["from"], edge_dict["to"]) for edge_dict in edges
+            ]:
+                edge_id = next(
+                    edge_id_generator
+                )  # Filtrar edge para evitar edges duplicados
+                head_to_tail_edge = {
+                    "id": edge_id,
+                    "label": triple["relation"],
+                    "from": head_id,
+                    "to": tail_id,
+                    "arrows": "to",
+                    "length": 300,
+                    "font": {"color": "#D3D3D3", "size": 22, "strokeWidth": 0},
+                    "smooth": {"enabled": True, "type": "continuous"},
+                    "width": 2.0,
+                }
+                edges.append(head_to_tail_edge)
             if head_added:
                 if (head_id, data_dict["_id"]) not in [
                     (edge_dict["from"], edge_dict["to"]) for edge_dict in edges
