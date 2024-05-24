@@ -266,6 +266,8 @@ def generate_kg_llm(news_data_llm) -> Dict[str, List]:
         }
         edges.append(news_to_media_edge)
         for triple in data_dict["triplets"]:
+            if "head" not in triple or "tail" not in triple:
+                continue
             head_added = False
             tail_added = False
             if not triple["head"] in [node["label"] for node in nodes]:
