@@ -21,9 +21,11 @@ import pytextrank
 
 from config.db import conn
 from extract.extract_entities import (
+    mongo_client,
     news_with_entities_spacy,
     nlp,
     extract_entities_spacy,
+    # extract_entities_llm,
     news_with_entities_llm,
     news_ids_without_llm_entities,
 )
@@ -42,6 +44,10 @@ from sections.footer import main_footer
 
 
 warnings.filterwarnings("ignore")
+
+# news_with_entities_llm, news_ids_without_llm_entities = extract_entities_llm(
+#     client=mongo_client, delta_days=1
+# )
 
 news_loaded = os.getenv("NEWS_LOADED")
 print(f"News loaded?: {news_loaded}")

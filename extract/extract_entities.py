@@ -11,10 +11,11 @@ from pymongo import MongoClient
 nlp = spacy.load("es_core_news_md")
 
 mongo_client = MongoClient(
-    host=settings_for_mongo.MONGOHOST,
-    port=settings_for_mongo.MONGOPORT,
-    username=settings_for_mongo.MONGOUSER,
-    password=settings_for_mongo.MONGOPASSWORD,
+    settings_for_mongo.MONGO_PRIVATE_URL
+    # host=settings_for_mongo.MONGOHOST,
+    # port=settings_for_mongo.MONGOPORT,
+    # username=settings_for_mongo.MONGOUSER,
+    # password=settings_for_mongo.MONGOPASSWORD,
 )
 
 
