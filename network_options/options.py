@@ -82,15 +82,15 @@ configure_ = {
 groups_ = {
     "MEDIA": {
         "shape": "icon",
-        "icon": {"face": '"Font Awesome 5 Free"', "code": "\uf1ea", "size": 60},
+        "icon": {"face": '"Font Awesome 6 Free"', "code": "\uf1ea", "size": 60},
     },
     "NEWS": {
         "shape": "icon",
-        "icon": {"face": '"Font Awesome 5 Free"', "code": "\uf15b", "size": 45},
+        "icon": {"face": '"Font Awesome 6 Free"', "code": "\uf15b", "size": 45},
     },
     "ENTITIES": {
         "shape": "icon",
-        "icon": {"face": '"Font Awesome 5 Free"', "code": "\uf2bd", "size": 35},
+        "icon": {"face": '"Font Awesome 6 Free"', "code": "\uf2bd", "size": 35},
     },
 }
 
