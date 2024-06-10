@@ -238,12 +238,10 @@ def generate_kg_llm(news_data_llm) -> Dict[str, List]:
             "group": "MEDIA",
             "shape": "icon",
             "icon": {
-                {
-                    "face": '"FontAwesome"',
-                    "code": "\uf1ea",
-                    "size": 60,
-                    "color": "#F8F9FA",
-                }
+                "face": '"FontAwesome"',
+                "code": "\uf1ea",
+                "size": 60,
+                "color": "#F8F9FA",
             },
             "font": {
                 "color": "white",
