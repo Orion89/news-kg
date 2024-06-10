@@ -78,19 +78,19 @@ configure_ = {
     "enabled": False,
     "showButton": False,
 }
-
+# '"Font Awesome 6 Free"'
 groups_ = {
     "MEDIA": {
         "shape": "icon",
-        "icon": {"face": '"Font Awesome 6 Free"', "code": "\uf1ea", "size": 60},
+        "icon": {"face": '"FontAwesome"', "code": "\uf1ea", "size": 60},
     },
     "NEWS": {
         "shape": "icon",
-        "icon": {"face": '"Font Awesome 6 Free"', "code": "\uf15b", "size": 45},
+        "icon": {"face": '"FontAwesome"', "code": "\uf15b", "size": 45},
     },
     "ENTITIES": {
         "shape": "icon",
-        "icon": {"face": '"Font Awesome 6 Free"', "code": "\uf2bd", "size": 35},
+        "icon": {"face": '"FontAwesome"', "code": "\uf2bd", "size": 35},
     },
 }
 
