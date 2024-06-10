@@ -100,7 +100,6 @@ default_options_ = dict(
     # width=width_,
     locale="es",
     configure=configure_,
-    groups=groups_,
     # nodes=nodes_,
     # edges=edges_,
     layout=layout_,
