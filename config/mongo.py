@@ -35,7 +35,7 @@ class SettingsForMongo(BaseSettings):
         return user
 
     @property
-    def MONGO_PRIVATE_URL(self):
+    def MONGO_URL(self):
         url = f"{self.MONGO_PRIVATE_URL}"
         return url
 
