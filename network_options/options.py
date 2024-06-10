@@ -79,12 +79,28 @@ configure_ = {
     "showButton": False,
 }
 
+groups_ = {
+    "MEDIA": {
+        "shape": "icon",
+        "icon": {"face": "'FontAwesome'", "code": "\uf1ea", "size": 60},
+    },
+    "NEWS": {
+        "shape": "icon",
+        "icon": {"face": "'FontAwesome'", "code": "\uf15b", "size": 45},
+    },
+    "ENTITIES": {
+        "shape": "icon",
+        "icon": {"face": "'FontAwesome'", "code": "\uf2bd", "size": 35},
+    },
+}
+
 default_options_ = dict(
     autoResize=True,
     # height=height_,
     # width=width_,
     locale="es",
     configure=configure_,
+    groups=groups_,
     # nodes=nodes_,
     # edges=edges_,
     layout=layout_,
