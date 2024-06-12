@@ -227,10 +227,10 @@ app.layout = dbc.Container(
                                     children=[
                                         html.I(
                                             className="bi bi-circle-fill",
-                                            style={"color": "#FFFF01"},
+                                            style={"color": "#98C2FC"},
                                         ),
                                         html.Span(
-                                            " Noticias", style={"color": "#FFFF01"}
+                                            " Noticias", style={"color": "#98C2FC"}
                                         ),
                                     ],
                                     className="bg-opacity-0 z-3 position-absolute",  # position-absolute
@@ -245,10 +245,10 @@ app.layout = dbc.Container(
                                     children=[
                                         html.I(
                                             className="bi bi-circle-fill",
-                                            style={"color": "#98C2FC"},
+                                            style={"color": "#FFFF01"},
                                         ),
                                         html.Span(
-                                            " Medios", style={"color": "#98C2FC"}
+                                            " Medios", style={"color": "#FFFF01"}
                                         ),
                                     ],
                                     className="bg-opacity-0 z-3 position-absolute",  # position-absolute
