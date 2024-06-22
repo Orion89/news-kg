@@ -235,6 +235,7 @@ def generate_kg_llm(news_data_llm) -> Dict[str, List]:
             "size": 60,
             "label": media_name,
             "title": media_name,
+            "mass": 10,
             "group": "MEDIA",
             "shape": "image",
             "image": "static/newspaper-regular.svg",
@@ -254,6 +255,7 @@ def generate_kg_llm(news_data_llm) -> Dict[str, List]:
             "size": 45,
             "title": data_dict["url"],
             "label": f"noticia_{data_dict['_id']}",
+            "mass": 7,
             "group": "NEWS",
             # 'color': colors_for_nodes['NEWS'],
             "shape": "image",
@@ -265,6 +267,7 @@ def generate_kg_llm(news_data_llm) -> Dict[str, List]:
         news_to_media_edge = {
             "id": edge_id,
             "label": "PUBLICADO_POR",
+            "length": 275,
             "from": data_dict["_id"],
             "to": media_ids[urlparse(data_dict["url"]).netloc],
             "arrows": "to",
@@ -293,7 +296,7 @@ def generate_kg_llm(news_data_llm) -> Dict[str, List]:
                     "group": "ENTITIES",
                     "shape": "image",
                     "image": "static/circle-user-solid.svg",
-                    "mass": 7,
+                    "mass": 4,
                     "font": {"color": "white", "size": 24},
                 }
                 nodes.append(head_node)
@@ -308,7 +311,7 @@ def generate_kg_llm(news_data_llm) -> Dict[str, List]:
                     "group": "ENTITIES",
                     "shape": "image",
                     "image": "static/circle-user-solid.svg",
-                    "mass": 7,
+                    "mass": 4,
                     "font": {"color": "white", "size": 24},
                 }
                 nodes.append(tail_node)
@@ -326,7 +329,7 @@ def generate_kg_llm(news_data_llm) -> Dict[str, List]:
                     "from": head_id,
                     "to": tail_id,
                     "arrows": "to",
-                    "length": 300,
+                    "length": 350,
                     "font": {"color": "#D3D3D3", "size": 22, "strokeWidth": 0},
                     "smooth": {"enabled": True, "type": "continuous"},
                     "width": 2.0,
@@ -340,6 +343,7 @@ def generate_kg_llm(news_data_llm) -> Dict[str, List]:
                     head_to_news_edge = {
                         "id": edge_id,
                         "label": "MENCIONADO_EN",
+                        "length": 375,
                         "from": head_id,
                         "to": data_dict["_id"],
                         "arrows": "to",
@@ -356,6 +360,7 @@ def generate_kg_llm(news_data_llm) -> Dict[str, List]:
                     tail_to_news_edge = {
                         "id": edge_id,
                         "label": "MENCIONADO_EN",
+                        "length": 375,
                         "from": tail_id,
                         "to": data_dict["_id"],
                         "arrows": "to",

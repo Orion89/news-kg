@@ -33,7 +33,7 @@ physics_ = {
     "barnesHut": {
         "gravitationalConstant": -5_000,
         "centralGravity": 0,
-        "springLength": 400,
+        "springLength": 350,
         "springConstant": 0.009,
         "damping": 0.025,
         "avoidOverlap": 0.1,
