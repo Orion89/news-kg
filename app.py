@@ -245,10 +245,10 @@ app.layout = dbc.Container(
                                     children=[
                                         html.I(
                                             className="bi bi-circle-fill",
-                                            style={"color": "#FFFF01"},
+                                            style={"color": "#F2E9D4"},
                                         ),
                                         html.Span(
-                                            " Medios", style={"color": "#FFFF01"}
+                                            " Medios", style={"color": "#F2E9D4"}
                                         ),
                                     ],
                                     className="bg-opacity-0 z-3 position-absolute",  # position-absolute
@@ -418,6 +418,7 @@ def show_news_date(selected_node_dict, data):
         if selected_node_dict:
             try:
                 selected_node_dict = selected_node_dict[0]
+                print(f"Noticias obtenidas: {len(news_with_entities_llm)}")
                 date_text = (
                     f'Noticia del {selected_node_dict["date"].strftime("%d-%m-%Y")}'
                 )
