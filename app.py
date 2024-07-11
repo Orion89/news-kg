@@ -185,6 +185,12 @@ app.layout = dbc.Container(
                 # ),
                 dbc.Col(
                     [
+                        dcc.Interval(
+                            id="load_interval",
+                            interval=1 * 1000,
+                            n_intervals=0,
+                            max_intervals=1,
+                        ),
                         dcc.Dropdown(
                             id="dropdown-2",
                             clearable=False,
@@ -372,6 +378,25 @@ app.layout = dbc.Container(
 #             return ''
 #     else:
 #         return '' # no_update
+
+
+@callback(
+    Output("kg_news-1", "data"),
+    Output("network-1", "children"),
+    Input("load_interval", "n_intervals"),
+)
+def load_kg(n_intervals):
+    data_for_kg = generate_kg_llm(news_data_llm=news_with_entities_llm)
+    kg_vis = DashNetwork(
+        id="kg_news-1",
+        style={"height": "800px", "width": "100%", "background": "#222222"},
+        data={"nodes": data_for_kg["nodes"], "edges": data_for_kg["edges"]},
+        options=default_options_,
+        enableHciEvents=True,
+        enablePhysicsEvents=False,
+        enableOtherEvents=False,
+    )
+    return kg_vis
 
 
 @callback(

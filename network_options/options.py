@@ -31,7 +31,7 @@ edges_ = {
 physics_ = {
     "enabled": True,
     "barnesHut": {
-        "gravitationalConstant": -5_000,
+        "gravitationalConstant": -4_500,
         "centralGravity": 0,
         "springLength": 350,
         "springConstant": 0.009,
