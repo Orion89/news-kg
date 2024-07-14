@@ -396,8 +396,8 @@ def load_kg(n_intervals):
         enablePhysicsEvents=False,
         enableOtherEvents=False,
     )
-    # return kg_vis
-    return {"nodes": data_for_kg["nodes"], "edges": data_for_kg["edges"]}
+    return kg_vis
+    # return {"nodes": data_for_kg["nodes"], "edges": data_for_kg["edges"]}
 
 
 @callback(
