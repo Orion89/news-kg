@@ -272,7 +272,7 @@ app.layout = dbc.Container(
                         dbc.Spinner(
                             children=[
                                 html.Div(
-                                    children=[network_1],
+                                    # children=[network_1],
                                     id="network-1",
                                     className="mt-0",
                                 )
