@@ -381,8 +381,8 @@ app.layout = dbc.Container(
 
 
 @callback(
-    Output("kg_news-1", "data"),
-    # Output("network-1", "children"),
+    # Output("kg_news-1", "data"),
+    Output("network-1", "children"),
     Input("load_interval", "n_intervals"),
 )
 def load_kg(n_intervals):
