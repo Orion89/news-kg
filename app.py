@@ -102,15 +102,15 @@ elif ENTITY_EXTRACTION_TYPE == "LLM":
 elif ENTITY_EXTRACTION_TYPE == "LLM+SPACY":
     raise NotImplementedError("El método aún no se implementa.")
 
-network_1 = DashNetwork(
-    id="kg_news-1",
-    style={"height": "800px", "width": "100%", "background": "#222222"},
-    data={"nodes": data_for_kg["nodes"], "edges": data_for_kg["edges"]},
-    options=default_options_,
-    enableHciEvents=True,
-    enablePhysicsEvents=False,
-    enableOtherEvents=False,
-)
+# network_1 = DashNetwork(
+#     id="kg_news-1",
+#     style={"height": "800px", "width": "100%", "background": "#222222"},
+#     data={"nodes": data_for_kg["nodes"], "edges": data_for_kg["edges"]},
+#     options=default_options_,
+#     enableHciEvents=True,
+#     enablePhysicsEvents=False,
+#     enableOtherEvents=False,
+# )
 
 # Layout
 app.layout = dbc.Container(
