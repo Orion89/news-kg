@@ -390,7 +390,7 @@ app.layout = dbc.Container(
     Input("load_interval", "n_intervals"),
 )
 def load_kg(n_intervals):
-    news_with_entities_llm, _ = extract_entities_llm(client=mongo_client, elta_days=2)
+    news_with_entities_llm, _ = extract_entities_llm(client=mongo_client, delta_days=2)
     data_for_kg = generate_kg_llm(news_data_llm=news_with_entities_llm)
     kg_vis = DashNetwork(
         id="kg_news-1",
