@@ -16,8 +16,10 @@ Las entidades y relaciones entre estas últimas son extraídas con Spacy y por m
 
 De la cantidad todal de noticias extraídas cada cierta frecuencia, solo se procesan 100 con el LLM debido a los costos generados, almacenando las entidades extraídas, y otros datos al respecto, en una base MongoDB.
 
+Tanto el *scraping* de noticias como la extracción de entidades y relaciones entre estas últimas se encuentra implenentado en el siguiente repositorio: [news-extractor](https://github.com/Orion89/news-extractor/tree/mistral-extractor).
+
 ## Front-End
 
-La *app* ha sido desarrollada con **Plotly Dash**, haciendo especial uso de [dashvis](https://pypi.org/project/dashvis/) para la visualización de la red.
+La *app* ha sido desarrollada con **Plotly Dash**, haciendo especial uso de [dashvis](https://pypi.org/project/dashvis/) para la visualización de la red. ***Dashvis***, tal como se indica en su [repositorio](), es una implementación completa para Plotly Dash del objeto `Network` de [vis.js](https://visjs.github.io/vis-network/docs/network/).
 
 **WORK IN PROGRESS**
