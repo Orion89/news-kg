@@ -18,13 +18,15 @@ from matplotlib.colors import rgb2hex
 from matplotlib.cm import get_cmap
 
 import pytextrank
+from pymongo import MongoClient
 
 from config.db import conn
+from config.mongo import settings_for_mongo
 from extract.extract_entities import (
     news_with_entities_spacy,
     nlp,
     extract_entities_spacy,
-    # extract_entities_llm,
+    extract_entities_llm,
     news_with_entities_llm,
 )
 from extract.extract_news import get_news, get_media_in_db, today, time_delta
@@ -57,6 +59,8 @@ print()
 print("==============================")
 # extraction types: LLM, SPACY, LLM+SPACY
 ENTITY_EXTRACTION_TYPE = "LLM"
+
+mongo_client = MongoClient(settings_for_mongo.MONGO_URL)
 
 # app initializing and options
 app = Dash(
@@ -386,6 +390,7 @@ app.layout = dbc.Container(
     Input("load_interval", "n_intervals"),
 )
 def load_kg(n_intervals):
+    news_with_entities_llm, _ = extract_entities_llm(client=mongo_client, elta_days=2)
     data_for_kg = generate_kg_llm(news_data_llm=news_with_entities_llm)
     kg_vis = DashNetwork(
         id="kg_news-1",
