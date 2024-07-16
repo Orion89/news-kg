@@ -387,7 +387,6 @@ app.layout = dbc.Container(
 @callback(
     # Output("kg_news-1", "data"),
     Output("network-1", "children"),
-    Output("store-1", "data"),
     Input("load_interval", "n_intervals"),
 )
 def load_kg(n_intervals):
@@ -402,7 +401,7 @@ def load_kg(n_intervals):
         enablePhysicsEvents=False,
         enableOtherEvents=False,
     )
-    return kg_vis, news_with_entities_llm
+    return kg_vis
     # return {"nodes": data_for_kg["nodes"], "edges": data_for_kg["edges"]}
 
 
@@ -441,64 +440,59 @@ def show_news_node_info(selected_node_dict, data):
     prevent_initial_call=True,
 )
 def show_news_date(selected_node_dict, data):
-    print(selected_node_dict)
-    try:
-        data = data if data else news_with_entities
-        if selected_node_dict and data:
-            node_selected_id = selected_node_dict["nodes"][0]
-            selected_node_dict = [
-                node_dict for node_dict in data if node_dict["id"] == node_selected_id
-            ]
-            if selected_node_dict:
-                try:
-                    selected_node_dict = selected_node_dict[0]
-                    print(f"Noticias obtenidas: {len(news_with_entities_llm)}")
-                    date_text = (
-                        f'Noticia del {selected_node_dict["date"].strftime("%d-%m-%Y")}'
-                    )
-                except Exception as e:
-                    return ""
-                else:
-                    return date_text
-            else:
+    data = data if data else news_with_entities
+    if selected_node_dict and data:
+        node_selected_id = selected_node_dict["nodes"][0]
+        selected_node_dict = [
+            node_dict for node_dict in data if node_dict["id"] == node_selected_id
+        ]
+        if selected_node_dict:
+            try:
+                selected_node_dict = selected_node_dict[0]
+                print(f"Noticias obtenidas: {len(news_with_entities_llm)}")
+                date_text = (
+                    f'Noticia del {selected_node_dict["date"].strftime("%d-%m-%Y")}'
+                )
+            except Exception as e:
                 return ""
+            else:
+                return date_text
         else:
-            return ""  # no_update
-    except Exception as e:
-        print(f"An error has ocurred in show_news_date callback: {e}")
-        return ""
+            return ""
+    else:
+        return ""  # no_update
 
 
-# @callback(
-#     Output("dropdown-2", "options"),
-#     Output("dropdown-2", "value"),
-#     Input("kg_news-1", "selectNode"),
-#     State("store-1", "data"),
-#     prevent_initial_call=True,
-# )
-# def get_keywords(selected_node_dict, data):
-#     if not data:
-#         data = news_with_entities  # return [{'label': '', 'value': ''}], ['']
-#     n = 5
-#     node_selected_id = selected_node_dict["nodes"][0]
-#     selected_news = [
-#         news_dict for news_dict in data if news_dict["id"] == node_selected_id
-#     ]
-#     if selected_news:
-#         selected_news = selected_news[0]
-#     else:
-#         return [{"label": "", "value": ""}], [""]
-#     if selected_news["body_text"]:
-#         doc_ = nlp(selected_news["body_text"])
-#         options = []
-#         value = []
-#         for kw in doc_._.phrases[:n]:
-#             if kw.text not in [token for token in doc_ if not token.is_stop]:
-#                 options.append({"label": kw.text, "value": kw.text})
-#                 value.append(kw.text)
-#         return options, value
-#     else:
-#         return [{"label": "", "value": ""}], [""]
+@callback(
+    Output("dropdown-2", "options"),
+    Output("dropdown-2", "value"),
+    Input("kg_news-1", "selectNode"),
+    State("store-1", "data"),
+    prevent_initial_call=True,
+)
+def get_keywords(selected_node_dict, data):
+    if not data:
+        data = news_with_entities  # return [{'label': '', 'value': ''}], ['']
+    n = 5
+    node_selected_id = selected_node_dict["nodes"][0]
+    selected_news = [
+        news_dict for news_dict in data if news_dict["id"] == node_selected_id
+    ]
+    if selected_news:
+        selected_news = selected_news[0]
+    else:
+        return [{"label": "", "value": ""}], [""]
+    if selected_news["body_text"]:
+        doc_ = nlp(selected_news["body_text"])
+        options = []
+        value = []
+        for kw in doc_._.phrases[:n]:
+            if kw.text not in [token for token in doc_ if not token.is_stop]:
+                options.append({"label": kw.text, "value": kw.text})
+                value.append(kw.text)
+        return options, value
+    else:
+        return [{"label": "", "value": ""}], [""]
 
 
 @callback(
@@ -509,46 +503,41 @@ def show_news_date(selected_node_dict, data):
     prevent_initial_call=True,
 )
 def get_keywords(selected_node_dict, data):
-    print(selected_node_dict)
-    try:
-        if not data:
-            data = news_with_entities  # return [{'label': '', 'value': ''}], ['']
-        n = 5
-        node_selected_id = selected_node_dict["nodes"][0]
-        selected_news = [
-            news_dict for news_dict in data if news_dict["id"] == node_selected_id
-        ]
-        if selected_news:
-            selected_news = selected_news[0]
-        else:
-            return [
-                {
-                    "label": "",
-                    "value": "",
-                }
-            ], [""]
-        if selected_news["body_text"]:
-            doc_ = nlp(selected_news["body_text"])
-            options = []
-            value = []
-            for kw in doc_._.phrases[:n]:
-                if kw.text not in [token for token in doc_ if not token.is_stop]:
-                    options.append(
-                        {
-                            "label": html.Span(
-                                [html.I(className="bi bi-bookmark-dash"), f"{kw.text}"],
-                                style={"color": "white", "font-size": 16},
-                            ),
-                            "value": kw.text,
-                        }
-                    )
-                    value.append(kw.text)
-            return options, value
-        else:
-            return [{"label": "", "value": ""}], [""]
-    except Exception as e:
-        print(f"An error has ocurred in get_keywords callback: {e}")
-        return no_update, no_update
+    if not data:
+        data = news_with_entities  # return [{'label': '', 'value': ''}], ['']
+    n = 5
+    node_selected_id = selected_node_dict["nodes"][0]
+    selected_news = [
+        news_dict for news_dict in data if news_dict["id"] == node_selected_id
+    ]
+    if selected_news:
+        selected_news = selected_news[0]
+    else:
+        return [
+            {
+                "label": "",
+                "value": "",
+            }
+        ], [""]
+    if selected_news["body_text"]:
+        doc_ = nlp(selected_news["body_text"])
+        options = []
+        value = []
+        for kw in doc_._.phrases[:n]:
+            if kw.text not in [token for token in doc_ if not token.is_stop]:
+                options.append(
+                    {
+                        "label": html.Span(
+                            [html.I(className="bi bi-bookmark-dash"), f"{kw.text}"],
+                            style={"color": "white", "font-size": 16},
+                        ),
+                        "value": kw.text,
+                    }
+                )
+                value.append(kw.text)
+        return options, value
+    else:
+        return [{"label": "", "value": ""}], [""]
 
 
 @callback(
