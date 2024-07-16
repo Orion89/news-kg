@@ -440,6 +440,8 @@ def show_news_node_info(selected_node_dict, data):
     prevent_initial_call=True,
 )
 def show_news_date(selected_node_dict, data):
+    if not selected_node_dict:
+        return ""
     data = data if data else news_with_entities
     if selected_node_dict and data:
         node_selected_id = selected_node_dict["nodes"][0]
@@ -471,6 +473,9 @@ def show_news_date(selected_node_dict, data):
     prevent_initial_call=True,
 )
 def get_keywords(selected_node_dict, data):
+    print(selected_node_dict)
+    if not selected_node_dict:
+        return [{"label": "", "value": ""}], [""]
     if not data:
         data = news_with_entities  # return [{'label': '', 'value': ''}], ['']
     n = 5
@@ -495,49 +500,49 @@ def get_keywords(selected_node_dict, data):
         return [{"label": "", "value": ""}], [""]
 
 
-@callback(
-    Output("dropdown-3", "options"),
-    Output("dropdown-3", "value"),
-    Input("kg_news-1", "selectNode"),
-    State("store-1", "data"),
-    prevent_initial_call=True,
-)
-def get_keywords(selected_node_dict, data):
-    if not data:
-        data = news_with_entities  # return [{'label': '', 'value': ''}], ['']
-    n = 5
-    node_selected_id = selected_node_dict["nodes"][0]
-    selected_news = [
-        news_dict for news_dict in data if news_dict["id"] == node_selected_id
-    ]
-    if selected_news:
-        selected_news = selected_news[0]
-    else:
-        return [
-            {
-                "label": "",
-                "value": "",
-            }
-        ], [""]
-    if selected_news["body_text"]:
-        doc_ = nlp(selected_news["body_text"])
-        options = []
-        value = []
-        for kw in doc_._.phrases[:n]:
-            if kw.text not in [token for token in doc_ if not token.is_stop]:
-                options.append(
-                    {
-                        "label": html.Span(
-                            [html.I(className="bi bi-bookmark-dash"), f"{kw.text}"],
-                            style={"color": "white", "font-size": 16},
-                        ),
-                        "value": kw.text,
-                    }
-                )
-                value.append(kw.text)
-        return options, value
-    else:
-        return [{"label": "", "value": ""}], [""]
+# @callback(
+#     Output("dropdown-3", "options"),
+#     Output("dropdown-3", "value"),
+#     Input("kg_news-1", "selectNode"),
+#     State("store-1", "data"),
+#     prevent_initial_call=True,
+# )
+# def get_keywords(selected_node_dict, data):
+#     if not data:
+#         data = news_with_entities  # return [{'label': '', 'value': ''}], ['']
+#     n = 5
+#     node_selected_id = selected_node_dict["nodes"][0]
+#     selected_news = [
+#         news_dict for news_dict in data if news_dict["id"] == node_selected_id
+#     ]
+#     if selected_news:
+#         selected_news = selected_news[0]
+#     else:
+#         return [
+#             {
+#                 "label": "",
+#                 "value": "",
+#             }
+#         ], [""]
+#     if selected_news["body_text"]:
+#         doc_ = nlp(selected_news["body_text"])
+#         options = []
+#         value = []
+#         for kw in doc_._.phrases[:n]:
+#             if kw.text not in [token for token in doc_ if not token.is_stop]:
+#                 options.append(
+#                     {
+#                         "label": html.Span(
+#                             [html.I(className="bi bi-bookmark-dash"), f"{kw.text}"],
+#                             style={"color": "white", "font-size": 16},
+#                         ),
+#                         "value": kw.text,
+#                     }
+#                 )
+#                 value.append(kw.text)
+#         return options, value
+#     else:
+#         return [{"label": "", "value": ""}], [""]
 
 
 @callback(
