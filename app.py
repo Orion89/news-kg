@@ -537,69 +537,69 @@ def get_keywords(selected_node_dict, data):
         return [{"label": "", "value": ""}], [""]
 
 
-@callback(
-    Output("kg_news-1", "data"),
-    Output("store-1", "data"),
-    Output("modal-2", "is_open", allow_duplicate=True),
-    Input("dropdown-1", "value"),
-    prevent_initial_call=True,
-)
-def update_kg_1(selected_media):
-    if selected_media == "Todos":
-        return (
-            {"nodes": data_for_kg["nodes"], "edges": data_for_kg["edges"]},
-            news_with_entities,
-            False,
-        )
-    else:
-        print(f"Se ha seleccionado un medio: {selected_media}")
-        # news_with_entities_filtered = [
-        #     news_dict for news_dict in news_with_entities if news_dict['media'] == selected_media
-        # ]
-        n = 100
-        today = datetime.today()
-        tz = timezone("UTC")
-        today = today.replace(tzinfo=tz)
-        extracted_raw_news = get_news(
-            connection=conn,
-            table_name="news_chile",
-            delta_days=1,
-            media_name=selected_media,
-            n=n,
-        )
-        try:
-            if ENTITY_EXTRACTION_TYPE == "SPACY":
-                news_with_entities_filtered = extract_entities_spacy(
-                    extracted_raw_news=extracted_raw_news, nlp=nlp
-                )
-            elif ENTITY_EXTRACTION_TYPE == "LLM":
-                news_with_entities_filtered = [
-                    news_dict
-                    for news_dict in news_with_entities_llm
-                    if news_dict["media"] == selected_media
-                ]
-        except Exception as e:
-            print(f"An error has ocurred in getting news from {selected_media}:\n{e}")
-            return no_update, no_update, True
-        if len(news_with_entities_filtered) == 0:
-            print(f"\t{selected_media} sin artículos disponibles")
-            return no_update, no_update, True
+# @callback(
+#     Output("kg_news-1", "data"),
+#     Output("store-1", "data"),
+#     Output("modal-2", "is_open", allow_duplicate=True),
+#     Input("dropdown-1", "value"),
+#     prevent_initial_call=True,
+# )
+# def update_kg_1(selected_media):
+#     if selected_media == "Todos":
+#         return (
+#             {"nodes": data_for_kg["nodes"], "edges": data_for_kg["edges"]},
+#             news_with_entities,
+#             False,
+#         )
+#     else:
+#         print(f"Se ha seleccionado un medio: {selected_media}")
+#         # news_with_entities_filtered = [
+#         #     news_dict for news_dict in news_with_entities if news_dict['media'] == selected_media
+#         # ]
+#         n = 100
+#         today = datetime.today()
+#         tz = timezone("UTC")
+#         today = today.replace(tzinfo=tz)
+#         extracted_raw_news = get_news(
+#             connection=conn,
+#             table_name="news_chile",
+#             delta_days=1,
+#             media_name=selected_media,
+#             n=n,
+#         )
+#         try:
+#             if ENTITY_EXTRACTION_TYPE == "SPACY":
+#                 news_with_entities_filtered = extract_entities_spacy(
+#                     extracted_raw_news=extracted_raw_news, nlp=nlp
+#                 )
+#             elif ENTITY_EXTRACTION_TYPE == "LLM":
+#                 news_with_entities_filtered = [
+#                     news_dict
+#                     for news_dict in news_with_entities_llm
+#                     if news_dict["media"] == selected_media
+#                 ]
+#         except Exception as e:
+#             print(f"An error has ocurred in getting news from {selected_media}:\n{e}")
+#             return no_update, no_update, True
+#         if len(news_with_entities_filtered) == 0:
+#             print(f"\t{selected_media} sin artículos disponibles")
+#             return no_update, no_update, True
 
-        if ENTITY_EXTRACTION_TYPE == "SPACY":
-            data, _ = generate_kg_spacy(
-                news_list=news_with_entities_filtered,
-                entity_types=entity_types_list,
-                colors=colors,
-                color_converter=rgb2hex,
-            )
-        elif ENTITY_EXTRACTION_TYPE == "LLM":
-            data = generate_kg_llm(news_data_llm=news_with_entities_filtered)
+#         if ENTITY_EXTRACTION_TYPE == "SPACY":
+#             data, _ = generate_kg_spacy(
+#                 news_list=news_with_entities_filtered,
+#                 entity_types=entity_types_list,
+#                 colors=colors,
+#                 color_converter=rgb2hex,
+#             )
+#         elif ENTITY_EXTRACTION_TYPE == "LLM":
+#             data = generate_kg_llm(news_data_llm=news_with_entities_filtered)
 
-        return (
-            {"nodes": data["nodes"], "edges": data["edges"]},
-            news_with_entities_filtered,
-            False,
-        )
+#         return (
+#             {"nodes": data["nodes"], "edges": data["edges"]},
+#             news_with_entities_filtered,
+#             False,
+#         )
 
 
 @callback(
