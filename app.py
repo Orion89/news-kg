@@ -301,13 +301,12 @@ app.layout = dbc.Container(
                     [
                         dcc.Dropdown(
                             id="dropdown-1",
-                            options=[{"label": "Todos", "value": "Todos"}]
-                            + [
+                            options=[
                                 {
                                     "label": html.Span(
                                         [
                                             html.I(className="bi bi-book"),
-                                            " " + f"{str(m)}",
+                                            " " + f"{str(node_dict["label"])}",
                                         ],
                                         className="bg-opacity-0",
                                         style={
@@ -316,12 +315,15 @@ app.layout = dbc.Container(
                                             "backgroundColor": "transparent",
                                         },
                                     ),
-                                    "value": str(m),
+                                    "value": str(node_dict["label"]),
                                 }
-                                for m in media_names
+                                for node_dict in data_for_kg["nodes"]
                             ],
                             # value='Todos',
-                            placeholder="Selecciona un medio",
+                            clearable=True,
+                            multi=False,
+                            searchable=True,
+                            placeholder="Selecciona una entidad",
                             className="bg-opacity-0",
                             style={"backgroundColor": "#222222"},
                         ),
@@ -333,7 +335,7 @@ app.layout = dbc.Container(
                     [
                         html.P(
                             children=[
-                                "Nodos amarillos representan entidades (extraídas con Mixtral 8x22B y Spacy) mencionadas en noticias. Una arista entre dos nodos de entidades corresponden a relaciones identificadas por un LLM y se identifican por su etiqueta."
+                                "Nodos en tonos rojos representan entidades (extraídas con Mixtral 8x22B y Spacy) mencionadas en noticias. Las aristas uniendo entidades corresponden a relaciones extraídas por el LLM y se identifican por su etiqueta."
                             ],
                             className="text-light text-end",
                         )
@@ -406,6 +408,18 @@ def load_kg(n_intervals):
 
 
 @callback(
+    # Output("kg_news-1", "data"),
+    Output("store-1", "data"),
+    Input("load_interval", "n_intervals"),
+)
+def load_data(n_intervals):
+    news_with_entities_llm, _ = extract_entities_llm(client=mongo_client, delta_days=2)
+    #data_for_kg = generate_kg_llm(news_data_llm=news_with_entities_llm)
+
+    return news_with_entities_llm
+
+
+@callback(
     Output("text-url-1", "children"),
     Input("kg_news-1", "selectNode"),
     State("store-1", "data"),
@@ -431,6 +445,26 @@ def show_news_node_info(selected_node_dict, data):
             return ""
     else:
         return ""  # no_update
+
+
+@callback(Output("kg_news-1", "focus"), Input("dropdown-1", "value"))
+def focus_on_selected_entity(selected_node):
+    if not selected_node:
+        return no_update
+    nodes = data_for_kg["nodes"]
+    selected_node_info = [
+        node_dict for node_dict in nodes if node_dict["label"] == selected_node
+    ][0]
+    print(selected_node_info)
+    return {
+        "nodeId": str(selected_node_info["id"]),
+        "options": {
+            "scale": 0.4,
+            "offset": {"x": 0.01, "y": 0.01},
+            "locked": False,
+            "animation": {"duration": 2000, "easingFunction": "linear"},
+        },
+    }
 
 
 @callback(
@@ -498,51 +532,6 @@ def get_keywords(selected_node_dict, data):
         return options, value
     else:
         return [{"label": "", "value": ""}], [""]
-
-
-# @callback(
-#     Output("dropdown-3", "options"),
-#     Output("dropdown-3", "value"),
-#     Input("kg_news-1", "selectNode"),
-#     State("store-1", "data"),
-#     prevent_initial_call=True,
-# )
-# def get_keywords(selected_node_dict, data):
-#     if not data:
-#         data = news_with_entities  # return [{'label': '', 'value': ''}], ['']
-#     n = 5
-#     node_selected_id = selected_node_dict["nodes"][0]
-#     selected_news = [
-#         news_dict for news_dict in data if news_dict["id"] == node_selected_id
-#     ]
-#     if selected_news:
-#         selected_news = selected_news[0]
-#     else:
-#         return [
-#             {
-#                 "label": "",
-#                 "value": "",
-#             }
-#         ], [""]
-#     if selected_news["body_text"]:
-#         doc_ = nlp(selected_news["body_text"])
-#         options = []
-#         value = []
-#         for kw in doc_._.phrases[:n]:
-#             if kw.text not in [token for token in doc_ if not token.is_stop]:
-#                 options.append(
-#                     {
-#                         "label": html.Span(
-#                             [html.I(className="bi bi-bookmark-dash"), f"{kw.text}"],
-#                             style={"color": "white", "font-size": 16},
-#                         ),
-#                         "value": kw.text,
-#                     }
-#                 )
-#                 value.append(kw.text)
-#         return options, value
-#     else:
-#         return [{"label": "", "value": ""}], [""]
 
 
 @callback(
