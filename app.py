@@ -306,7 +306,10 @@ app.layout = dbc.Container(
                                     "label": html.Span(
                                         [
                                             html.I(className="bi bi-book"),
-                                            " " + f"{str(node_dict["label"])}",
+                                            " "
+                                            + str(
+                                                node_dict["label"]
+                                            ),  # f"{str(node_dict["label"])}"
                                         ],
                                         className="bg-opacity-0",
                                         style={
@@ -414,7 +417,7 @@ def load_kg(n_intervals):
 )
 def load_data(n_intervals):
     news_with_entities_llm, _ = extract_entities_llm(client=mongo_client, delta_days=2)
-    #data_for_kg = generate_kg_llm(news_data_llm=news_with_entities_llm)
+    # data_for_kg = generate_kg_llm(news_data_llm=news_with_entities_llm)
 
     return news_with_entities_llm
 
