@@ -321,12 +321,13 @@ app.layout = dbc.Container(
                                     "value": str(node_dict["label"]),
                                 }
                                 for node_dict in data_for_kg["nodes"]
+                                if node_dict["group"] == "ENTITIES"
                             ],
                             # value='Todos',
                             clearable=True,
                             multi=False,
                             searchable=True,
-                            placeholder="Selecciona una entidad",
+                            placeholder="Selecciona o busca una entidad",
                             className="bg-opacity-0",
                             style={"backgroundColor": "#222222"},
                         ),
@@ -454,7 +455,11 @@ def show_news_node_info(selected_node_dict, data):
 def focus_on_selected_entity(selected_node):
     if not selected_node:
         return no_update
-    nodes = data_for_kg["nodes"]
+    nodes = [
+        node_dict
+        for node_dict in data_for_kg["nodes"]
+        if node_dict["group"] == "ENTITIES"
+    ]
     selected_node_info = [
         node_dict for node_dict in nodes if node_dict["label"] == selected_node
     ][0]
@@ -465,7 +470,7 @@ def focus_on_selected_entity(selected_node):
             "scale": 0.4,
             "offset": {"x": 0.01, "y": 0.01},
             "locked": False,
-            "animation": {"duration": 2000, "easingFunction": "linear"},
+            "animation": {"duration": 1500, "easingFunction": "linear"},
         },
     }
 
