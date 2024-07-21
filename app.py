@@ -462,12 +462,12 @@ def set_initial_move_and_zoom(n_intervals, pos):
 def show_news_node_info(selected_node_dict, data):
     data = data if data else news_with_entities
     if selected_node_dict:
-        print(f"from show_news_node_info: {selected_node_dict}")
+        print(f"selected node from show_news_node_info: {selected_node_dict}")
         # print(selected_node_dict)
         node_selected_id = selected_node_dict["nodes"][0]
         # print(node_selected_id)
         selected_node = [
-            node_dict for node_dict in data if node_dict["id"] == node_selected_id
+            node_dict for node_dict in data if node_dict["_id"] == node_selected_id
         ]
         if selected_node:
             selected_node = selected_node[0]
@@ -511,13 +511,13 @@ def focus_on_selected_entity(selected_node):
 def show_news_date(selected_node_dict, data):
     if not selected_node_dict:
         return ""
-    print(f"from show_news_date: {selected_node_dict}")
+    print(f"selected node from show_news_date: {selected_node_dict}")
     data = data if data else news_with_entities
-    print(f"data from show_news_data: {data[:5]}")
+    # print(f"data from show_news_data: {data[:5]}")
     if selected_node_dict and data:
         node_selected_id = selected_node_dict["nodes"][0]
         selected_node_dict = [
-            node_dict for node_dict in data if node_dict["id"] == node_selected_id
+            node_dict for node_dict in data if node_dict["_id"] == node_selected_id
         ]
         if selected_node_dict:
             try:
@@ -549,12 +549,12 @@ def get_keywords(selected_node_dict, data):
         return [{"label": "", "value": ""}], [""]
     if not data:
         data = news_with_entities  # return [{'label': '', 'value': ''}], ['']
-    print(f"from get_keywords: {selected_node_dict}")
-    print(f"data from get_keywords: {data[:5]}")
+    print(f"selected node from get_keywords: {selected_node_dict}")
+    # print(f"data from get_keywords: {data[:5]}")
     n = 5
     node_selected_id = selected_node_dict["nodes"][0]
     selected_news = [
-        news_dict for news_dict in data if news_dict["id"] == node_selected_id
+        news_dict for news_dict in data if news_dict["_id"] == node_selected_id
     ]
     if selected_news:
         selected_news = selected_news[0]
