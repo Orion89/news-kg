@@ -103,8 +103,6 @@ elif ENTITY_EXTRACTION_TYPE == "LLM":
     media_names = list(
         set([urlparse(news_dict["url"]).netloc for news_dict in news_with_entities_llm])
     )
-    print("data_for_kg")
-    print(data_for_kg[:5])
 elif ENTITY_EXTRACTION_TYPE == "LLM+SPACY":
     raise NotImplementedError("El método aún no se implementa.")
 
@@ -515,6 +513,7 @@ def show_news_date(selected_node_dict, data):
         return ""
     print(f"from show_news_date: {selected_node_dict}")
     data = data if data else news_with_entities
+    print(f"data from show_news_data: {data[:5]}")
     if selected_node_dict and data:
         node_selected_id = selected_node_dict["nodes"][0]
         selected_node_dict = [
@@ -550,7 +549,8 @@ def get_keywords(selected_node_dict, data):
         return [{"label": "", "value": ""}], [""]
     if not data:
         data = news_with_entities  # return [{'label': '', 'value': ''}], ['']
-    print(f"from show_news_node_info: {selected_node_dict}")
+    print(f"from get_keywords: {selected_node_dict}")
+    print(f"data from get_keywords: {data[:5]}")
     n = 5
     node_selected_id = selected_node_dict["nodes"][0]
     selected_news = [
