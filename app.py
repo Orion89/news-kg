@@ -103,6 +103,8 @@ elif ENTITY_EXTRACTION_TYPE == "LLM":
     media_names = list(
         set([urlparse(news_dict["url"]).netloc for news_dict in news_with_entities_llm])
     )
+    print("data_for_kg")
+    print(data_for_kg[:5])
 elif ENTITY_EXTRACTION_TYPE == "LLM+SPACY":
     raise NotImplementedError("El método aún no se implementa.")
 
@@ -194,6 +196,12 @@ app.layout = dbc.Container(
                             interval=1 * 1000,
                             n_intervals=0,
                             max_intervals=1,
+                        ),
+                        dcc.Interval(
+                            id="load_interval-2",
+                            interval=1 * 1000,
+                            n_intervals=0,
+                            max_intervals=7,
                         ),
                         dcc.Dropdown(
                             id="dropdown-2",
@@ -423,6 +431,31 @@ def load_data(n_intervals):
 
 
 @callback(
+    Output("kg_news-1", "moveTo"),
+    Input("load_interval-2", "n_intervals"),
+    State("kg_news-1", "getViewPosition"),
+)
+def set_initial_move_and_zoom(n_intervals, pos):
+    if n_intervals > 6:
+        return {
+            "options": {
+                "position": {"x": pos["x"], "y": pos["y"]},
+                "scale": 0.7,
+                "offset": {"x": 0, "y": 0},
+                "locked": False,
+                "animation": (
+                    {
+                        "duration": 1500,
+                        "easingFunction": "lienar",
+                    }
+                ),
+            }
+        }
+    else:
+        no_update
+
+
+@callback(
     Output("text-url-1", "children"),
     Input("kg_news-1", "selectNode"),
     State("store-1", "data"),
@@ -431,6 +464,7 @@ def load_data(n_intervals):
 def show_news_node_info(selected_node_dict, data):
     data = data if data else news_with_entities
     if selected_node_dict:
+        print(f"from show_news_node_info: {selected_node_dict}")
         # print(selected_node_dict)
         node_selected_id = selected_node_dict["nodes"][0]
         # print(node_selected_id)
@@ -479,6 +513,7 @@ def focus_on_selected_entity(selected_node):
 def show_news_date(selected_node_dict, data):
     if not selected_node_dict:
         return ""
+    print(f"from show_news_date: {selected_node_dict}")
     data = data if data else news_with_entities
     if selected_node_dict and data:
         node_selected_id = selected_node_dict["nodes"][0]
@@ -510,11 +545,12 @@ def show_news_date(selected_node_dict, data):
     prevent_initial_call=True,
 )
 def get_keywords(selected_node_dict, data):
-    print(selected_node_dict)
+    # print(selected_node_dict)
     if not selected_node_dict:
         return [{"label": "", "value": ""}], [""]
     if not data:
         data = news_with_entities  # return [{'label': '', 'value': ''}], ['']
+    print(f"from show_news_node_info: {selected_node_dict}")
     n = 5
     node_selected_id = selected_node_dict["nodes"][0]
     selected_news = [
