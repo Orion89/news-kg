@@ -336,8 +336,12 @@ app.layout = dbc.Container(
                             className="bg-opacity-0",
                             style={"backgroundColor": "#222222"},
                         ),
-                        dcc.Store(id="store-1", storage_type="session"), # store-1 for raw news from db
-                        dcc.Store(id="store-2", storage_type="session"), # store-2 for info from llm processed news
+                        dcc.Store(
+                            id="store-1", storage_type="session"
+                        ),  # store-1 for raw news from db
+                        dcc.Store(
+                            id="store-2", storage_type="session"
+                        ),  # store-2 for info from llm processed news
                     ],
                     width={"size": 5, "offset": 0},
                 ),
@@ -418,7 +422,7 @@ def load_kg(n_intervals):
         "ids": [news_dict["_id"] for news_dict in news_with_entities_llm],
         "urls": [news_dict["url"] for news_dict in news_with_entities_llm],
     }
-    print(f"from load_kg: ids from mongo: {news_info_processed_by_llm["ids"]}")
+    print(f"from load_kg: ids from mongo: {news_info_processed_by_llm['ids']}")
     return kg_vis, news_info_processed_by_llm
     # return {"nodes": data_for_kg["nodes"], "edges": data_for_kg["edges"]}
 
