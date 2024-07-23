@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from pytz import timezone
 
-from extract.extract_news import get_news, n
+from extract.extract_news import get_news_from_table, n
 from config.db import conn
 from config.mongo import settings_for_mongo
 
@@ -87,8 +87,8 @@ def extract_entities_llm(
     return news_objs_with_llm_entities, news_ids_without_llm_entities
 
 
-extracted_raw_news = get_news(
-    connection=conn, table_name="news_chile", delta_days=1, n=n  # conn_postgresql
+extracted_raw_news = get_news_from_table(
+    connection=conn, table_name="news_chile", delta_days=2, n=n  # conn_postgresql
 )
 
 news_with_entities_spacy = extract_entities_spacy(
