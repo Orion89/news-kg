@@ -29,7 +29,7 @@ from extract.extract_entities import (
     extract_entities_llm,
     news_with_entities_llm,
 )
-from extract.extract_news import get_news, get_media_in_db, today, time_delta
+from extract.extract_news import get_news_from_table, get_media_in_db, today, time_delta
 from generate_networks import (
     generate_kg_spacy,
     generate_kg_llm,
@@ -336,7 +336,8 @@ app.layout = dbc.Container(
                             className="bg-opacity-0",
                             style={"backgroundColor": "#222222"},
                         ),
-                        dcc.Store(id="store-1", storage_type="session"),
+                        dcc.Store(id="store-1", storage_type="session"), # store-1 for raw news from db
+                        dcc.Store(id="store-2", storage_type="session"), # store-2 for info from llm processed news
                     ],
                     width={"size": 5, "offset": 0},
                 ),
@@ -398,6 +399,7 @@ app.layout = dbc.Container(
 @callback(
     # Output("kg_news-1", "data"),
     Output("network-1", "children"),
+    Output("store-2", "data"),
     Input("load_interval", "n_intervals"),
 )
 def load_kg(n_intervals):
@@ -412,7 +414,12 @@ def load_kg(n_intervals):
         enablePhysicsEvents=False,
         enableOtherEvents=False,
     )
-    return kg_vis
+    news_info_processed_by_llm = {
+        "ids": [news_dict["_id"] for news_dict in news_with_entities_llm],
+        "urls": [news_dict["url"] for news_dict in news_with_entities_llm],
+    }
+    print(f"from load_kg: ids from mongo: {news_info_processed_by_llm["ids"]}")
+    return kg_vis, news_info_processed_by_llm
     # return {"nodes": data_for_kg["nodes"], "edges": data_for_kg["edges"]}
 
 
@@ -420,12 +427,21 @@ def load_kg(n_intervals):
     # Output("kg_news-1", "data"),
     Output("store-1", "data"),
     Input("load_interval", "n_intervals"),
+    State("store-2", "data"),
+    prevent_initial_call=True,
 )
-def load_data(n_intervals):
+def load_data(n_intervals, data):
     news_with_entities_llm, _ = extract_entities_llm(client=mongo_client, delta_days=2)
     # data_for_kg = generate_kg_llm(news_data_llm=news_with_entities_llm)
-
-    return news_with_entities_llm
+    news_ids_from_mongo = data["ids"]
+    raw_news_from_db = get_news_from_table(connection=conn, delta_days=2)
+    raw_news_filterd_by_id = list(
+        filter(lambda news_dict: news_dict[0] in news_ids_from_mongo, raw_news_from_db)
+    )
+    print(
+        f"from load_data: len of raw_news_filtered_by_id: {len(raw_news_filterd_by_id)}"
+    )
+    return raw_news_filterd_by_id
 
 
 @callback(

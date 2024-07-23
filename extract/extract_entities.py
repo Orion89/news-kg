@@ -98,8 +98,8 @@ news_with_entities_llm, news_ids_without_llm_entities = extract_entities_llm(
     client=mongo_client, delta_days=1
 )
 
-print(f"Cantidad en llm entities: {len(news_with_entities_llm)}")
-print(f"Cantidad en spacy entities: {len(news_with_entities_spacy)}")
+# print(f"Cantidad en llm entities: {len(news_with_entities_llm)}")
+# print(f"Cantidad en spacy entities: {len(news_with_entities_spacy)}")
 
 for news_dict in news_with_entities_llm:
     same_news = [
