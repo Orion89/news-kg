@@ -88,7 +88,7 @@ def extract_entities_llm(
 
 
 extracted_raw_news = get_news_from_table(
-    connection=conn, table_name="news_chile", delta_days=2, n=n  # conn_postgresql
+    connection=conn, table_name="news_chile", delta_days=2  # conn_postgresql
 )
 
 news_with_entities_spacy = extract_entities_spacy(
