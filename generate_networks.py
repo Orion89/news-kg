@@ -241,7 +241,7 @@ def generate_kg_llm(news_data_llm) -> Dict[str, List]:
             "image": "static/newspaper-regular.svg",
             "font": {
                 "color": "white",
-                "size": 30,
+                "size": 48,
                 "bold": {"color": "white", "size": 30, "face": "arial", "mod": "bold"},
             },
         }

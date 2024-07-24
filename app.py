@@ -307,32 +307,32 @@ app.layout = dbc.Container(
                     [
                         dcc.Dropdown(
                             id="dropdown-1",
-                            options=[
-                                {
-                                    "label": html.Span(
-                                        [
-                                            html.I(className="bi bi-book"),
-                                            " "
-                                            + str(
-                                                node_dict["label"]
-                                            ),  # f"{str(node_dict["label"])}"
-                                        ],
-                                        className="bg-opacity-0",
-                                        style={
-                                            "color": "white",
-                                            "font-size": 16,
-                                            "backgroundColor": "transparent",
-                                        },
-                                    ),
-                                    "value": str(node_dict["label"]),
-                                }
-                                for node_dict in data_for_kg["nodes"]
-                            ],
+                            # options=[
+                            #     {
+                            #         "label": html.Span(
+                            #             [
+                            #                 html.I(className="bi bi-book"),
+                            #                 " "
+                            #                 + str(
+                            #                     node_dict["label"]
+                            #                 ),  # f"{str(node_dict["label"])}"
+                            #             ],
+                            #             className="bg-opacity-0",
+                            #             style={
+                            #                 "color": "white",
+                            #                 "font-size": 16,
+                            #                 "backgroundColor": "transparent",
+                            #             },
+                            #         ),
+                            #         "value": str(node_dict["label"]),
+                            #     }
+                            #     for node_dict in data_for_kg["nodes"]
+                            # ],
                             # value='Todos',
                             clearable=True,
                             multi=False,
                             searchable=True,
-                            placeholder="Selecciona una entidad",
+                            placeholder="Selecciona o busca una entidad",
                             className="bg-opacity-0",
                             style={"backgroundColor": "#222222"},
                         ),
@@ -404,6 +404,7 @@ app.layout = dbc.Container(
     # Output("kg_news-1", "data"),
     Output("network-1", "children"),
     Output("store-2", "data"),
+    Output("dropdown-1", "options"),
     Input("load_interval", "n_intervals"),
 )
 def load_kg(n_intervals):
@@ -418,13 +419,32 @@ def load_kg(n_intervals):
         enablePhysicsEvents=False,
         enableOtherEvents=False,
     )
+    # data for store-2
     news_info_processed_by_llm = {
         "ids": [news_dict["_id"] for news_dict in news_with_entities_llm],
         "urls": [news_dict["url"] for news_dict in news_with_entities_llm],
     }
+    # options for dropdown-1
+    options = [
+        {
+            "label": html.Span(
+                [
+                    html.I(className="bi bi-book"),
+                    " " + str(node_dict["label"]),  # f"{str(node_dict["label"])}"
+                ],
+                className="bg-opacity-0",
+                style={
+                    "color": "white",
+                    "font-size": 16,
+                    "backgroundColor": "transparent",
+                },
+            ),
+            "value": str(node_dict["id"]),
+        }
+        for node_dict in data_for_kg["nodes"]
+    ]
     print(f"from load_kg: ids from mongo: {news_info_processed_by_llm['ids']}")
-    return kg_vis, news_info_processed_by_llm
-    # return {"nodes": data_for_kg["nodes"], "edges": data_for_kg["edges"]}
+    return kg_vis, news_info_processed_by_llm, options
 
 
 @callback(
@@ -502,17 +522,22 @@ def show_news_node_info(selected_node_dict, data):
         return ""  # no_update
 
 
-@callback(Output("kg_news-1", "focus"), Input("dropdown-1", "value"))
+@callback(
+    Output("kg_news-1", "focus"),
+    Input("dropdown-1", "value"),
+    prevent_initial_call=True,
+)
 def focus_on_selected_entity(selected_node):
+    print(f"from focus_on_selected_entity: {selected_node}")
     if not selected_node:
         return no_update
-    nodes = data_for_kg["nodes"]
-    selected_node_info = [
-        node_dict for node_dict in nodes if node_dict["label"] == selected_node
-    ][0]
-    print(selected_node_info)
+    # nodes = data_for_kg["nodes"]
+    # selected_node_info = [
+    #     node_dict for node_dict in nodes if node_dict["label"] == selected_node
+    # ][0]
+    # print(selected_node_info)
     return {
-        "nodeId": str(selected_node_info["id"]),
+        "nodeId": str(selected_node),
         "options": {
             "scale": 0.4,
             "offset": {"x": 0.01, "y": 0.01},
