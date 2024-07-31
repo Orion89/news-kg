@@ -163,30 +163,6 @@ app.layout = dbc.Container(
         ),
         dbc.Row(
             [
-                # dbc.Col(
-                #     [
-                #        dcc.Dropdown(
-                #             id='dropdown-3',
-                #             clearable=False,
-                #             multi=True,
-                #             searchable=False,
-                #             placeholder='Keywords de noticia seleccionada',
-                #             maxHeight=800,
-                #             className='bg-opacity-0 z-3 position-absolute',
-                #             style={
-                #                 'backgroundColor': 'transparent',
-                #                 'width': '250px'
-                #             #     'opacity': 0,
-                #                 # 'position': 'absolute',
-                #                 # 'left': 0,
-                #                 # 'width': '100%',
-                #             }
-                #         )
-                #     ],
-                #     width={'size': 2, 'offset': 0},
-                #     class_name='bg-opacity-0',
-                #     align="start"
-                # ),
                 dbc.Col(
                     [
                         dcc.Interval(
@@ -408,7 +384,7 @@ app.layout = dbc.Container(
     Input("load_interval", "n_intervals"),
 )
 def load_kg(n_intervals):
-    news_with_entities_llm, _ = extract_entities_llm(client=mongo_client, delta_days=2)
+    news_with_entities_llm, _ = extract_entities_llm(client=mongo_client, delta_days=3)
     data_for_kg = generate_kg_llm(news_data_llm=news_with_entities_llm)
     kg_vis = DashNetwork(
         id="kg_news-1",
@@ -501,8 +477,9 @@ def set_initial_move_and_zoom(n_intervals, pos):
 )
 def show_news_node_info(selected_node_dict, data):
     data = data if data else news_with_entities
+    print(f"data from show_news_node_info: {data[0]}\n")
     if selected_node_dict:
-        print(f"selected node from show_news_node_info: {selected_node_dict}")
+        # print(f"selected node from show_news_node_info: {selected_node_dict}")
         # print(selected_node_dict)
         node_selected_id = selected_node_dict["nodes"][0]
         # print(node_selected_id)
@@ -528,7 +505,7 @@ def show_news_node_info(selected_node_dict, data):
     prevent_initial_call=True,
 )
 def focus_on_selected_entity(selected_node):
-    print(f"from focus_on_selected_entity: {selected_node}")
+    print(f"from focus_on_selected_entity: {selected_node}\n")
     if not selected_node:
         return no_update
     # nodes = data_for_kg["nodes"]
@@ -556,8 +533,9 @@ def focus_on_selected_entity(selected_node):
 def show_news_date(selected_node_dict, data):
     if not selected_node_dict:
         return ""
-    print(f"selected node from show_news_date: {selected_node_dict}")
+    print(f"selected node from show_news_date: {selected_node_dict}\n")
     data = data if data else news_with_entities
+    print(f"data from show_news_date: {data[0]}")
     # print(f"data from show_news_data: {data[:5]}")
     if selected_node_dict and data:
         node_selected_id = selected_node_dict["nodes"][0]

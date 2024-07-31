@@ -1,6 +1,31 @@
 from itertools import count
+from pathlib import Path
 from typing import Dict, List
 from urllib.parse import urlparse
+
+
+static_folder_path = Path("./static/")
+node_type_to_icon = {
+    "media": "newspaper-regular.svg",
+    "news": "envelope-open-text-solid.svg",
+    "Action": "arrows-alt-svgrepo-com.svg",  # rgb(219, 40, 73)
+    "BioChemEntity": "flask-vial-solid.svg",
+    "CreativeWork": "paintbrush-solid.svg",
+    "Event": "calendar-check-regular.svg",
+    "Intangible": "eye-solid.svg",
+    "MedicalEntity": "notes-medical-solid.svg",
+    "Organization": "organization-svgrepo-com.svg",  # rgb(177, 151, 252)
+    "Person": "circle-user-solid.svg",
+    "Place": "location-pin-svgrepo-com.svg",  # rgb(22, 171, 22)
+    "Product": "product-workspace-svgrepo-com.svg",  # rgb(142, 203, 203)
+    "Taxon": "category-list-solid-svgrepo-com.svg",  # rgb(0, 158, 219)
+    "Boolean": "boolean-svgrepo-com.svg",  # rgb(143, 163, 188)
+    "Date": "date-2-svgrepo-com.svg",  # rgb(143, 163, 188)
+    "DateTime": "clock-svgrepo-com.svg",  # rgb(143, 163, 188)
+    "Number": "number-sign-110-svgrepo-com.svg",  # rgb(143, 163, 188)
+    "Text": "text-square-svgrepo-com.svg",  # rgb(143, 163, 188)
+    "Time": "time-svgrepo-com.svg",  # rgb(143, 163, 188)
+}
 
 
 def generate_kg_spacy(
@@ -295,9 +320,12 @@ def generate_kg_llm(news_data_llm) -> Dict[str, List]:
                     "title": triple["type_head"],
                     "group": "ENTITIES",
                     "shape": "image",
-                    "image": "static/circle-user-solid.svg",
+                    "image": static_folder_path
+                    / node_type_to_icon.get(
+                        triple["type_head"], "stattic/dot-svgrepo-com.svg"
+                    ),  # "static/circle-user-solid.svg",
                     "mass": 4,
-                    "font": {"color": "white", "size": 24},
+                    "font": {"color": "white", "size": 32},
                 }
                 nodes.append(head_node)
                 head_added = True
@@ -310,9 +338,12 @@ def generate_kg_llm(news_data_llm) -> Dict[str, List]:
                     "title": triple["type_tail"],
                     "group": "ENTITIES",
                     "shape": "image",
-                    "image": "static/circle-user-solid.svg",
+                    "image": static_folder_path
+                    / node_type_to_icon.get(
+                        triple["type_tail"], "stattic/dot-svgrepo-com.svg"
+                    ),  # "static/circle-user-solid.svg",
                     "mass": 4,
-                    "font": {"color": "white", "size": 24},
+                    "font": {"color": "white", "size": 32},
                 }
                 nodes.append(tail_node)
                 tail_added = True
