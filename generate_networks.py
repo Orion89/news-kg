@@ -4,27 +4,27 @@ from typing import Dict, List
 from urllib.parse import urlparse
 
 
-static_folder_path = Path("./static/")
+# static_folder_path = Path("./static/")
 node_type_to_icon = {
-    "media": "newspaper-regular.svg",
-    "news": "envelope-open-text-solid.svg",
-    "Action": "arrows-alt-svgrepo-com.svg",  # rgb(219, 40, 73)
-    "BioChemEntity": "flask-vial-solid.svg",
-    "CreativeWork": "paintbrush-solid.svg",
-    "Event": "calendar-check-regular.svg",
-    "Intangible": "eye-solid.svg",
-    "MedicalEntity": "notes-medical-solid.svg",
-    "Organization": "organization-svgrepo-com.svg",  # rgb(177, 151, 252)
-    "Person": "circle-user-solid.svg",
-    "Place": "location-pin-svgrepo-com.svg",  # rgb(22, 171, 22)
-    "Product": "product-workspace-svgrepo-com.svg",  # rgb(142, 203, 203)
-    "Taxon": "category-list-solid-svgrepo-com.svg",  # rgb(0, 158, 219)
-    "Boolean": "boolean-svgrepo-com.svg",  # rgb(143, 163, 188)
-    "Date": "date-2-svgrepo-com.svg",  # rgb(143, 163, 188)
-    "DateTime": "clock-svgrepo-com.svg",  # rgb(143, 163, 188)
-    "Number": "number-sign-110-svgrepo-com.svg",  # rgb(143, 163, 188)
-    "Text": "text-square-svgrepo-com.svg",  # rgb(143, 163, 188)
-    "Time": "time-svgrepo-com.svg",  # rgb(143, 163, 188)
+    "media": "static/newspaper-regular.svg",
+    "news": "static/envelope-open-text-solid.svg",
+    "Action": "static/arrows-alt-svgrepo-com.svg",  # rgb(219, 40, 73)
+    "BioChemEntity": "static/flask-vial-solid.svg",
+    "CreativeWork": "static/paintbrush-solid.svg",
+    "Event": "static/calendar-check-regular.svg",
+    "Intangible": "static/eye-solid.svg",
+    "MedicalEntity": "static/notes-medical-solid.svg",
+    "Organization": "static/organization-svgrepo-com.svg",  # rgb(177, 151, 252)
+    "Person": "static/circle-user-solid.svg",
+    "Place": "static/location-pin-svgrepo-com.svg",  # rgb(22, 171, 22)
+    "Product": "static/product-workspace-svgrepo-com.svg",  # rgb(142, 203, 203)
+    "Taxon": "static/category-list-solid-svgrepo-com.svg",  # rgb(0, 158, 219)
+    "Boolean": "static/boolean-svgrepo-com.svg",  # rgb(143, 163, 188)
+    "Date": "static/date-2-svgrepo-com.svg",  # rgb(143, 163, 188)
+    "DateTime": "static/clock-svgrepo-com.svg",  # rgb(143, 163, 188)
+    "Number": "static/number-sign-110-svgrepo-com.svg",  # rgb(143, 163, 188)
+    "Text": "static/text-square-svgrepo-com.svg",  # rgb(143, 163, 188)
+    "Time": "static/time-svgrepo-com.svg",  # rgb(143, 163, 188)
 }
 
 
@@ -320,9 +320,8 @@ def generate_kg_llm(news_data_llm) -> Dict[str, List]:
                     "title": triple["type_head"],
                     "group": "ENTITIES",
                     "shape": "image",
-                    "image": static_folder_path
-                    / node_type_to_icon.get(
-                        triple["type_head"], "stattic/dot-svgrepo-com.svg"
+                    "image": node_type_to_icon.get(
+                        triple["type_head"], "static/dot-svgrepo-com.svg"
                     ),  # "static/circle-user-solid.svg",
                     "mass": 4,
                     "font": {"color": "white", "size": 32},
@@ -338,9 +337,8 @@ def generate_kg_llm(news_data_llm) -> Dict[str, List]:
                     "title": triple["type_tail"],
                     "group": "ENTITIES",
                     "shape": "image",
-                    "image": static_folder_path
-                    / node_type_to_icon.get(
-                        triple["type_tail"], "stattic/dot-svgrepo-com.svg"
+                    "image": node_type_to_icon.get(
+                        triple["type_tail"], "static/dot-svgrepo-com.svg"
                     ),  # "static/circle-user-solid.svg",
                     "mass": 4,
                     "font": {"color": "white", "size": 32},
