@@ -431,7 +431,7 @@ def load_kg(n_intervals):
     prevent_initial_call=True,
 )
 def load_data(n_intervals, data):
-    news_with_entities_llm, _ = extract_entities_llm(client=mongo_client, delta_days=2)
+    # news_with_entities_llm, _ = extract_entities_llm(client=mongo_client, delta_days=2)
     # data_for_kg = generate_kg_llm(news_data_llm=news_with_entities_llm)
     news_ids_from_mongo = data["ids"]
     raw_news_from_db = get_news_from_table(connection=conn, delta_days=2)
@@ -539,16 +539,16 @@ def show_news_date(selected_node_dict, data):
     # print(f"data from show_news_data: {data[:5]}")
     if selected_node_dict and data:
         node_selected_id = selected_node_dict["nodes"][0]
+        # selected_node_dict = [node_dict for node_dict in data if node_dict["_id"] == node_selected_id]
         selected_node_dict = [
-            node_dict for node_dict in data if node_dict["_id"] == node_selected_id
+            node_dict for node_dict in data if node_dict[0] == node_selected_id
         ]
         if selected_node_dict:
             try:
                 selected_node_dict = selected_node_dict[0]
                 print(f"Noticias obtenidas: {len(news_with_entities_llm)}")
-                date_text = (
-                    f'Noticia del {selected_node_dict["date"].strftime("%d-%m-%Y")}'
-                )
+                # f'Noticia del {selected_node_dict["date"].strftime("%d-%m-%Y")}'
+                date_text = f'Noticia del {selected_node_dict[1].strftime("%d-%m-%Y")}'
             except Exception as e:
                 return ""
             else:
@@ -576,14 +576,16 @@ def get_keywords(selected_node_dict, data):
     # print(f"data from get_keywords: {data[:5]}")
     n = 5
     node_selected_id = selected_node_dict["nodes"][0]
+    # selected_node_dict = [node_dict for node_dict in data if node_dict["_id"] == node_selected_id]
     selected_news = [
-        news_dict for news_dict in data if news_dict["_id"] == node_selected_id
+        news_dict for news_dict in data if news_dict[0] == node_selected_id
     ]
     if selected_news:
         selected_news = selected_news[0]
     else:
         return [{"label": "", "value": ""}], [""]
-    if selected_news["body_text"]:
+    # if selected_news["body_text"]:
+    if selected_news[4]:
         doc_ = nlp(selected_news["body_text"])
         options = []
         value = []
