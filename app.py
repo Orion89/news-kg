@@ -541,14 +541,16 @@ def show_news_date(selected_node_dict, data):
         node_selected_id = selected_node_dict["nodes"][0]
         # selected_node_dict = [node_dict for node_dict in data if node_dict["_id"] == node_selected_id]
         selected_node_dict = [
-            node_dict for node_dict in data if node_dict[0] == node_selected_id
+            node_dict for node_dict in data if node_dict["_id"] == node_selected_id
         ]
         if selected_node_dict:
             try:
                 selected_node_dict = selected_node_dict[0]
                 print(f"Noticias obtenidas: {len(news_with_entities_llm)}")
                 # f'Noticia del {selected_node_dict["date"].strftime("%d-%m-%Y")}'
-                date_text = f'Noticia del {selected_node_dict[1].strftime("%d-%m-%Y")}'
+                date_text = (
+                    f'Noticia del {selected_node_dict["date"].strftime("%d-%m-%Y")}'
+                )
             except Exception as e:
                 return ""
             else:
@@ -578,14 +580,14 @@ def get_keywords(selected_node_dict, data):
     node_selected_id = selected_node_dict["nodes"][0]
     # selected_node_dict = [node_dict for node_dict in data if node_dict["_id"] == node_selected_id]
     selected_news = [
-        news_dict for news_dict in data if news_dict[0] == node_selected_id
+        news_dict for news_dict in data if news_dict["_id"] == node_selected_id
     ]
     if selected_news:
         selected_news = selected_news[0]
     else:
         return [{"label": "", "value": ""}], [""]
     # if selected_news["body_text"]:
-    if selected_news[4]:
+    if selected_news["body_text"]:
         doc_ = nlp(selected_news["body_text"])
         options = []
         value = []
